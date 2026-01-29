@@ -41,7 +41,9 @@ export function JsonOutput({
           >
             <FileJson2 className="h-4 w-4 text-secondary" />
           </motion.div>
-          <span className="text-sm font-semibold text-secondary">Formatted Output</span>
+          <span className="text-sm font-semibold text-secondary">
+            Formatted Output
+          </span>
         </div>
 
         <AnimatePresence mode="wait">
@@ -54,7 +56,9 @@ export function JsonOutput({
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20"
             >
               <CheckCircle2 className="h-4 w-4 text-secondary" />
-              <span className="text-xs font-medium text-secondary">Valid JSON</span>
+              <span className="text-xs font-medium text-secondary">
+                Valid JSON
+              </span>
             </motion.div>
           ) : error ? (
             <motion.div
@@ -65,7 +69,9 @@ export function JsonOutput({
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20"
             >
               <AlertCircle className="h-4 w-4 text-destructive" />
-              <span className="text-xs font-medium text-destructive">Invalid JSON</span>
+              <span className="text-xs font-medium text-destructive">
+                Invalid JSON
+              </span>
             </motion.div>
           ) : (
             <motion.div
@@ -75,16 +81,19 @@ export function JsonOutput({
               exit={{ opacity: 0, scale: 0.8 }}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border"
             >
-              <span className="text-xs font-medium text-muted-foreground">Waiting...</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                Waiting...
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       <div
-        className={`flex-1 rounded-xl border-2 border-secondary/20 overflow-auto ${
-          displayLayout === "side-by-side" ? "min-h-[350px]" : "min-h-[300px]"
-        }`}
+        className={`flex-1 rounded-xl border-2 border-secondary/20 overflow-auto
+    [overflow-wrap:anywhere]
+    ${displayLayout === "side-by-side" ? "min-h-[350px]" : "min-h-[300px]"}
+  `}
       >
         <AnimatePresence mode="wait">
           {parsedJson ? (
@@ -99,10 +108,14 @@ export function JsonOutput({
                 src={parsedJson}
                 collapsed={false}
                 enableClipboard={true}
-                displayDataTypes={settings.selectedFormatterDataTypes === "true"}
-                displayObjectSize={settings.selecteddisplayObjectSize === "true"}
+                displayDataTypes={
+                  settings.selectedFormatterDataTypes === "true"
+                }
+                displayObjectSize={
+                  settings.selecteddisplayObjectSize === "true"
+                }
                 iconStyle={settings.selectedIconStyle}
-                theme={isDark ? "bright" : settings.selectedTheme as any}
+                theme={isDark ? "bright" : (settings.selectedTheme as any)}
                 style={{
                   backgroundColor: isDark ? "#1a1a2e" : "#f8fdf9",
                   fontSize: `${settings.fontSize}px`,
@@ -118,14 +131,14 @@ export function JsonOutput({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-full p-8 text-center"
+              className="flex flex-col items-center justify-center h-full p-8 text-center "
             >
               <motion.div
                 className="mb-4"
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <FileJson2 className="h-16 w-16 text-muted-foreground/30" />
+                <FileJson2 className="h-16 w-16 text-muted-foreground/30 " />
               </motion.div>
               <p className="text-muted-foreground font-medium">
                 {error ? error : "Formatted JSON will appear here..."}
