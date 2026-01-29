@@ -171,7 +171,7 @@ const Index = () => {
             </h1>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-row items-center gap-2">
             <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <SettingsPanel
               isOpen={displaySettings}
