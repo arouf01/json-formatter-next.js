@@ -10,7 +10,7 @@ export function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
   return (
     <motion.button
       onClick={onToggle}
-      className="relative flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card shadow-card transition-colors hover:bg-accent"
+      className="relative flex h-8 w-8 md:h-12 md:w-12 items-center justify-center rounded md:rounded-xl border border-border bg-card shadow-card transition-colors hover:bg-accent"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       aria-label="Toggle theme"
@@ -24,9 +24,9 @@ export function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
         {isDark ? (
-          <Moon className="h-5 w-5 text-primary" />
+          <Moon className="h-3 w-3 md:h-5 md:w-5 text-primary" />
         ) : (
-          <Sun className="h-5 w-5 text-primary" />
+          <Sun className="h-3 w-3 md:h-5 md:w-5 text-primary" />
         )}
       </motion.div>
       <motion.div

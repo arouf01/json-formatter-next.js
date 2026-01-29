@@ -109,6 +109,7 @@ const Index = () => {
         setParsedJson(null);
         setError("Invalid JSON");
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert("Clipboard error: " + err.message);
     }
@@ -156,17 +157,17 @@ const Index = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4"
+          className="flex flex-row justify-between items-center mb-8 gap-4"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 md:gap-3">
             <motion.div
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 shadow-glow"
+              className="flex w-8 h-8 md:h-12 md:w-12 items-center justify-center rounded-sm md:rounded-xl bg-primary/10 shadow-glow"
               whileHover={{ rotate: 10, scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <Braces className="h-6 w-6 text-primary" />
             </motion.div>
-            <h1 className="text-3xl md:text-4xl font-bold gradient-text-primary">
+            <h1 className="text-medium md:text-4xl w-20 md:w-auto font-bold gradient-text-primary leading-none">
               JSON Formatter
             </h1>
           </div>

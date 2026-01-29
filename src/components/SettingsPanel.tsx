@@ -20,10 +20,10 @@ export function SettingsPanel({
       {/* Trigger Button */}
       <motion.button
         onClick={onToggle}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-card text-primary font-medium shadow-card hover:bg-accent"
+        className="flex items-center gap-2 py-1.5 px-3 md:px-5 md:py-2.5 rounded-sm md:rounded-xl border border-border bg-card text-primary font-medium shadow-card hover:bg-accent"
       >
         <Settings2 className="h-5 w-5" />
-        <span>Display Settings</span>
+        <span className="text-xs md:text-lg">Display Settings</span>
       </motion.button>
 
       {/* Sidebar */}
