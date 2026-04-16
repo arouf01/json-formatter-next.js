@@ -40,6 +40,7 @@ const Index = () => {
   const [settings, setSettings] = useState(defaultSettings);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [displaySettings, setDisplaySettings] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
 
   // Load settings from localStorage
   useEffect(() => {
@@ -59,18 +60,23 @@ const Index = () => {
             const jsonParsed = JSON.parse(parsed.jsonInput);
             setFormattedJson(JSON.stringify(jsonParsed, null, 2));
             setParsedJson(jsonParsed);
-            setError(null);
           } catch {
             setFormattedJson("");
             setParsedJson(null);
-            setError("Invalid JSON in saved settings");
+            toast({
+              title: "Invalid JSON in saved settings",
+              description:
+                "The saved JSON could not be parsed. Please check your settings.",
+              variant: "destructive",
+              duration: 4000,
+            });
           }
         }
       } catch (err) {
         console.error("Error loading saved settings:", err);
       }
     }
-  }, []);
+  }, [toast]);
 
   const handleSettingChange = (key: string, value: string | number) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -108,34 +114,52 @@ const Index = () => {
   };
 
   const handleParsedJsonContent = (content: string) => {
-    try {
-      const parsed = JSON.parse(content);
-      if (
-        parsed &&
-        typeof parsed === "object" &&
-        "title" in parsed &&
-        "data" in parsed
-      ) {
-        // Embedded title and data
-        setJsonTitle(parsed.title || "");
-        setJsonInput(JSON.stringify(parsed.data, null, 2));
-        setFormattedJson(JSON.stringify(parsed.data, null, 2));
-        setParsedJson(parsed.data);
-      } else {
-        // Normal JSON
+    if (content.trim() === "") {
+      toast({
+        title: "File is empty",
+        description: "The uploaded file contains no JSON data.",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+    setIsFormatting(true);
+
+    setTimeout(() => {
+      try {
+        const parsed = JSON.parse(content);
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          "title" in parsed &&
+          "data" in parsed
+        ) {
+          // Embedded title and data
+          setJsonTitle(parsed.title || "");
+          setJsonInput(JSON.stringify(parsed.data, null, 2));
+          setFormattedJson(JSON.stringify(parsed.data, null, 2));
+          setParsedJson(parsed.data);
+        } else {
+          // Normal JSON
+          setJsonTitle("");
+          setJsonInput(content);
+          setFormattedJson(JSON.stringify(parsed, null, 2));
+          setParsedJson(parsed);
+        }
+      } catch {
         setJsonTitle("");
         setJsonInput(content);
-        setFormattedJson(JSON.stringify(parsed, null, 2));
-        setParsedJson(parsed);
+        setFormattedJson("");
+        setParsedJson(null);
+        toast({
+          title: "Invalid JSON",
+          description: "Please check your JSON syntax and try again.",
+          variant: "destructive",
+          duration: 4000,
+        });
       }
-      setError(null);
-    } catch {
-      setJsonTitle("");
-      setJsonInput(content);
-      setFormattedJson("");
-      setParsedJson(null);
-      setError("Invalid JSON");
-    }
+      setIsFormatting(false);
+    }, 1800);
   };
 
   const handleFileUpload = async (file: File) => {
@@ -199,16 +223,36 @@ const Index = () => {
   };
 
   const formatJSON = () => {
-    try {
-      const parsed = JSON.parse(jsonInput);
-      setFormattedJson(JSON.stringify(parsed, null, 2));
-      setParsedJson(parsed);
-      setError(null);
-    } catch {
-      setFormattedJson("");
-      setParsedJson(null);
-      setError("Invalid JSON");
+    if (jsonInput.trim() === "") {
+      toast({
+        title: "No JSON entered",
+        description: "Please enter some JSON to format.",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
     }
+
+    setIsFormatting(true);
+
+    // Simulate processing time for better UX
+    setTimeout(() => {
+      try {
+        const parsed = JSON.parse(jsonInput);
+        setFormattedJson(JSON.stringify(parsed, null, 2));
+        setParsedJson(parsed);
+      } catch {
+        setFormattedJson("");
+        setParsedJson(null);
+        toast({
+          title: "Invalid JSON",
+          description: "Please check your JSON syntax and try again.",
+          variant: "destructive",
+          duration: 4000,
+        });
+      }
+      setIsFormatting(false);
+    }, 1800);
   };
 
   const downloadJSON = () => {
@@ -229,16 +273,35 @@ const Index = () => {
     try {
       const text = await navigator.clipboard.readText();
       setJsonInput(text);
-      try {
-        const parsed = JSON.parse(text);
-        setFormattedJson(JSON.stringify(parsed, null, 2));
-        setParsedJson(parsed);
-        setError(null);
-      } catch {
-        setFormattedJson("");
-        setParsedJson(null);
-        setError("Invalid JSON");
+      if (text.trim() === "") {
+        toast({
+          title: "Clipboard is empty",
+          description: "Please copy some JSON to paste.",
+          variant: "destructive",
+          duration: 4000,
+        });
+        return;
       }
+      setIsFormatting(true);
+
+      // Simulate processing time for better UX
+      setTimeout(() => {
+        try {
+          const parsed = JSON.parse(text);
+          setFormattedJson(JSON.stringify(parsed, null, 2));
+          setParsedJson(parsed);
+        } catch {
+          setFormattedJson("");
+          setParsedJson(null);
+          toast({
+            title: "Invalid JSON",
+            description: "Please check your JSON syntax and try again.",
+            variant: "destructive",
+            duration: 4000,
+          });
+        }
+        setIsFormatting(false);
+      }, 1800);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert("Clipboard error: " + err.message);
@@ -341,11 +404,10 @@ const Index = () => {
 
           <JsonOutput
             parsedJson={parsedJson}
-            error={error}
             settings={settings}
             displayLayout={settings.displayLayout}
             isDark={isDark}
-            isLoading={false}
+            isLoading={isFormatting}
             onDownload={downloadJSON}
           />
         </motion.div>

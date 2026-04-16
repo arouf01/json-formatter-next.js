@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactJson from "react-json-view";
+import gojoRunning from "@/assets/gojo_running.gif";
 import {
   CheckCircle2,
   FileJson2,
@@ -11,7 +12,6 @@ import {
 
 interface JsonOutputProps {
   parsedJson: object | null;
-  error: string | null;
   settings: {
     selectedFormatterDataTypes: string;
     selecteddisplayObjectSize: string;
@@ -27,7 +27,6 @@ interface JsonOutputProps {
 
 export function JsonOutput({
   parsedJson,
-  error,
   settings,
   displayLayout,
   isDark,
@@ -157,19 +156,6 @@ export function JsonOutput({
                   Valid JSON
                 </span>
               </motion.div>
-            ) : error ? (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20"
-              >
-                <AlertCircle className="h-4 w-4 text-destructive" />
-                <span className="text-xs font-medium text-destructive">
-                  Invalid JSON
-                </span>
-              </motion.div>
             ) : (
               <motion.div
                 key="empty"
@@ -275,15 +261,38 @@ export function JsonOutput({
               className="flex flex-col items-center justify-center h-full p-8"
             >
               <motion.div
-                className="mb-4"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="mb-6"
+                animate={{ y: [0, -12, 0] }}
+                transition={{
+                  duration: 1.2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
-                <FileJson2 className="h-16 w-16 text-muted-foreground/30" />
+                <motion.img
+                  src={gojoRunning}
+                  alt="Gojo running"
+                  className="w-40 h-auto"
+                  animate={{ rotate: [0, 2, -2, 0] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
               </motion.div>
-              <p className="text-muted-foreground font-medium">
-                Processing JSON...
-              </p>
+
+              <motion.p
+                className="text-muted-foreground font-medium text-center"
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                Formatting your JSON...
+                <br />
+                <span className="text-sm opacity-75">
+                  Gojo's on the run - just a moment.
+                </span>
+              </motion.p>
             </motion.div>
           ) : parsedJson ? (
             <motion.div
@@ -342,7 +351,7 @@ export function JsonOutput({
                 <FileJson2 className="h-16 w-16 text-muted-foreground/30 " />
               </motion.div>
               <p className="text-muted-foreground font-medium">
-                {error ? error : "Formatted JSON will appear here..."}
+                Formatted JSON will appear here...
               </p>
               <p className="text-sm text-muted-foreground/60 mt-2">
                 Paste your JSON and click Format
