@@ -106,6 +106,38 @@ const Index = () => {
     }
   };
 
+  const minifyJSON = () => {
+    if (parsedJson) {
+      const minified = JSON.stringify(parsedJson);
+      setJsonInput(minified);
+      setFormattedJson(minified);
+      // Keep parsedJson the same for display
+    } else {
+      try {
+        const parsed = JSON.parse(jsonInput);
+        const minified = JSON.stringify(parsed);
+        setJsonInput(minified);
+        setFormattedJson(minified);
+        setParsedJson(parsed);
+        setError(null);
+      } catch {
+        setError("Invalid JSON");
+      }
+    }
+  };
+
+  const downloadJSON = () => {
+    if (parsedJson) {
+      const dataStr = JSON.stringify(parsedJson, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const exportFileDefaultName = 'formatted.json';
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    }
+  };
+
   const pasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
@@ -212,6 +244,7 @@ const Index = () => {
             value={jsonInput}
             onChange={handleInputChange}
             onFormat={formatJSON}
+            onMinify={minifyJSON}
             onClear={clearInput}
             onPaste={pasteFromClipboard}
             displayLayout={settings.displayLayout}
@@ -223,6 +256,8 @@ const Index = () => {
             settings={settings}
             displayLayout={settings.displayLayout}
             isDark={isDark}
+            isLoading={false}
+            onDownload={downloadJSON}
           />
         </motion.div>
 
