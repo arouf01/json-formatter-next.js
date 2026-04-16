@@ -20,7 +20,7 @@ const defaultSettings = {
 
 const Index = () => {
   const { isDark, toggleTheme } = useTheme();
-  
+
   const [jsonInput, setJsonInput] = useState(defaultSettings.jsonInput);
   const [formattedJson, setFormattedJson] = useState("");
   const [parsedJson, setParsedJson] = useState<object | null>(null);
@@ -68,7 +68,10 @@ const Index = () => {
       ...settings,
       jsonInput,
     };
-    localStorage.setItem("jsonFormatterSettings", JSON.stringify(settingsToSave));
+    localStorage.setItem(
+      "jsonFormatterSettings",
+      JSON.stringify(settingsToSave),
+    );
     setShowSaveSuccess(true);
     setTimeout(() => setShowSaveSuccess(false), 3000);
   };
@@ -109,7 +112,7 @@ const Index = () => {
         setParsedJson(null);
         setError("Invalid JSON");
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert("Clipboard error: " + err.message);
     }
@@ -230,8 +233,28 @@ const Index = () => {
           className="mt-12 text-center"
         >
           <p className="text-sm text-muted-foreground">
-            Paste • Format • Copy — Your JSON, beautifully formatted
+            Paste • Format • Copy - Your JSON, beautifully formatted
           </p>
+          <div className="mt-4 text-xs text-muted-foreground">
+            <p>
+              Powered by{" "}
+              <a
+                href="https://a1zohosolutions.com/"
+                target="_blank"
+                className="text-primary hover:underline"
+              >
+                A1 Zoho Solutions
+              </a>{" "}
+              | Developed by{" "}
+              <a
+                href="https://arouf.a1zohosolutions.com/"
+                target="_blank"
+                className="text-primary hover:underline"
+              >
+                Abdur Rouf
+              </a>
+            </p>
+          </div>
         </motion.footer>
       </div>
     </div>
