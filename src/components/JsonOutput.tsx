@@ -264,7 +264,7 @@ export function JsonOutput({
                 className="mb-6"
                 animate={{ y: [0, -12, 0] }}
                 transition={{
-                  duration: 1.2,
+                  duration: 1,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
@@ -273,9 +273,8 @@ export function JsonOutput({
                   src={gojoRunning}
                   alt="Gojo running"
                   className="w-40 h-auto"
-                  animate={{ rotate: [0, 2, -2, 0] }}
                   transition={{
-                    duration: 2,
+                    duration: 1,
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
@@ -284,8 +283,7 @@ export function JsonOutput({
 
               <motion.p
                 className="text-muted-foreground font-medium text-center"
-                animate={{ scale: [1, 1.03, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
+                transition={{ duration: 1, repeat: Infinity }}
               >
                 Formatting your JSON...
                 <br />
