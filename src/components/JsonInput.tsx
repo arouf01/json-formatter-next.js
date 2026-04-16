@@ -72,7 +72,7 @@ export function JsonInput({
       transition={{ duration: 0.5, delay: 0.1 }}
       className="flex flex-col h-full p-5 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 shadow-card"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
         <div className="flex items-center gap-2">
           <motion.div
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10"
@@ -86,13 +86,13 @@ export function JsonInput({
             (Drag JSON file here)
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <FileText className="h-4 w-4 text-primary" />
           <input
             type="text"
             value={titleValue}
             onChange={(e) => onTitleChange(e.target.value)}
-            className="px-3 py-1 text-sm border border-border rounded-md bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+            className="px-3 py-1 text-sm border border-border rounded-md bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 w-full"
             placeholder="Title"
           />
         </div>
