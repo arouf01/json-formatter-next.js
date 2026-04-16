@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Braces } from "lucide-react";
+import { Braces, HelpCircle } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { JsonInput } from "@/components/JsonInput";
 import { JsonOutput } from "@/components/JsonOutput";
 import { ErrorAlert } from "@/components/ErrorAlert";
+import { HistoryPanel } from "@/components/HistoryPanel";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcutsHelp";
 
 const defaultSettings = {
   jsonInput: "",
@@ -17,6 +19,12 @@ const defaultSettings = {
   fontSize: 16,
   displayLayout: "side-by-side",
 };
+
+interface HistoryItem {
+  id: string;
+  json: string;
+  timestamp: number;
+}
 
 const Index = () => {
   const { isDark, toggleTheme } = useTheme();

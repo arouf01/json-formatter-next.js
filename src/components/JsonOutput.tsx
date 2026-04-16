@@ -1,6 +1,13 @@
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactJson from "react-json-view";
-import { CheckCircle2, FileJson2, AlertCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  FileJson2,
+  AlertCircle,
+  Download,
+  Search,
+} from "lucide-react";
 
 interface JsonOutputProps {
   parsedJson: object | null;
@@ -14,6 +21,8 @@ interface JsonOutputProps {
   };
   displayLayout: string;
   isDark: boolean;
+  isLoading: boolean;
+  onDownload: () => void;
 }
 
 export function JsonOutput({
@@ -22,8 +31,95 @@ export function JsonOutput({
   settings,
   displayLayout,
   isDark,
+  isLoading,
+  onDownload,
 }: JsonOutputProps) {
+  const [searchTerm, setSearchTerm] = useState("");
   const isValid = parsedJson !== null;
+
+  // Calculate JSON statistics
+  const calculateStats = (obj: any) => {
+    let keyCount = 0;
+    let arrayCount = 0;
+    let depth = 0;
+
+    const traverse = (o: any, currentDepth: number) => {
+      depth = Math.max(depth, currentDepth);
+
+      if (Array.isArray(o)) {
+        arrayCount++;
+        o.forEach((item) => traverse(item, currentDepth + 1));
+      } else if (o !== null && typeof o === "object") {
+        keyCount += Object.keys(o).length;
+        Object.values(o).forEach((value) => traverse(value, currentDepth + 1));
+      }
+    };
+
+    traverse(obj, 1);
+    return { keyCount, arrayCount, depth };
+  };
+
+  const stats = parsedJson ? calculateStats(parsedJson) : null;
+
+  // Filter JSON based on search term
+  const filterJson = (obj: any, term: string): any => {
+    if (!term.trim()) return obj;
+
+    const term_lower = term.toLowerCase();
+    let matchCount = 0;
+
+    const filter = (o: any): any => {
+      if (o === null || o === undefined) return undefined;
+
+      if (Array.isArray(o)) {
+        const filtered = o
+          .map((item) => filter(item))
+          .filter((item) => item !== undefined);
+        return filtered.length > 0 ? filtered : undefined;
+      } else if (typeof o === "object") {
+        const result: any = {};
+        let hasMatch = false;
+
+        for (const [key, value] of Object.entries(o)) {
+          const keyMatches = key.toLowerCase().includes(term_lower);
+          const filteredValue = filter(value);
+
+          if (keyMatches) {
+            matchCount++;
+            result[key] = value;
+            hasMatch = true;
+          } else if (filteredValue !== undefined) {
+            result[key] = filteredValue;
+            hasMatch = true;
+          } else if (
+            typeof value === "string" &&
+            value.toLowerCase().includes(term_lower)
+          ) {
+            matchCount++;
+            result[key] = value;
+            hasMatch = true;
+          }
+        }
+
+        return hasMatch ? result : undefined;
+      } else if (
+        typeof o === "string" &&
+        o.toLowerCase().includes(term_lower)
+      ) {
+        matchCount++;
+        return o;
+      }
+
+      return undefined;
+    };
+
+    const filtered = filter(obj);
+    return { filtered: filtered || {}, matchCount };
+  };
+
+  const searchResult = searchTerm ? filterJson(parsedJson, searchTerm) : null;
+  const displayJson = searchResult?.filtered || parsedJson;
+  const matchCount = searchResult?.matchCount || 0;
 
   return (
     <motion.div
@@ -46,48 +142,122 @@ export function JsonOutput({
           </span>
         </div>
 
-        <AnimatePresence mode="wait">
-          {isValid ? (
-            <motion.div
-              key="valid"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20"
+        <div className="flex items-center gap-2">
+          <AnimatePresence mode="wait">
+            {isValid ? (
+              <motion.div
+                key="valid"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20"
+              >
+                <CheckCircle2 className="h-4 w-4 text-secondary" />
+                <span className="text-xs font-medium text-secondary">
+                  Valid JSON
+                </span>
+              </motion.div>
+            ) : error ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20"
+              >
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <span className="text-xs font-medium text-destructive">
+                  Invalid JSON
+                </span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border"
+              >
+                <span className="text-xs font-medium text-muted-foreground">
+                  Waiting...
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {parsedJson && (
+            <motion.button
+              onClick={onDownload}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 transition-all duration-200"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <CheckCircle2 className="h-4 w-4 text-secondary" />
+              <Download className="h-4 w-4 text-secondary" />
               <span className="text-xs font-medium text-secondary">
-                Valid JSON
+                Download
               </span>
-            </motion.div>
-          ) : error ? (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20"
-            >
-              <AlertCircle className="h-4 w-4 text-destructive" />
-              <span className="text-xs font-medium text-destructive">
-                Invalid JSON
-              </span>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border"
-            >
-              <span className="text-xs font-medium text-muted-foreground">
-                Waiting...
-              </span>
-            </motion.div>
+            </motion.button>
           )}
-        </AnimatePresence>
+        </div>
       </div>
+
+      {/* Search Bar */}
+      {parsedJson && (
+        <motion.div
+          className="mb-3"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-secondary/20 bg-secondary/5">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search keys or values..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 bg-transparent text-sm text-foreground focus:outline-none placeholder:text-muted-foreground"
+            />
+            {searchTerm && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-xs font-medium text-secondary bg-secondary/10 px-2 py-1 rounded"
+              >
+                {matchCount} match{matchCount !== 1 ? "es" : ""}
+              </motion.span>
+            )}
+            {searchTerm && (
+              <motion.button
+                onClick={() => setSearchTerm("")}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                ✕
+              </motion.button>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Statistics */}
+      {stats && (
+        <motion.div
+          className="mb-3 flex flex-wrap gap-2 text-xs"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div className="px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
+            Keys: {stats.keyCount}
+          </div>
+          <div className="px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary">
+            Arrays: {stats.arrayCount}
+          </div>
+          <div className="px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent-foreground">
+            Depth: {stats.depth}
+          </div>
+        </motion.div>
+      )}
 
       <div
         className={`flex-1 rounded-xl border-2 border-secondary/20 overflow-auto
@@ -96,7 +266,26 @@ export function JsonOutput({
   `}
       >
         <AnimatePresence mode="wait">
-          {parsedJson ? (
+          {isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center h-full p-8"
+            >
+              <motion.div
+                className="mb-4"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              >
+                <FileJson2 className="h-16 w-16 text-muted-foreground/30" />
+              </motion.div>
+              <p className="text-muted-foreground font-medium">
+                Processing JSON...
+              </p>
+            </motion.div>
+          ) : parsedJson ? (
             <motion.div
               key="json"
               initial={{ opacity: 0 }}
@@ -104,26 +293,36 @@ export function JsonOutput({
               exit={{ opacity: 0 }}
               className="h-full"
             >
-              <ReactJson
-                src={parsedJson}
-                collapsed={false}
-                enableClipboard={true}
-                displayDataTypes={
-                  settings.selectedFormatterDataTypes === "true"
-                }
-                displayObjectSize={
-                  settings.selecteddisplayObjectSize === "true"
-                }
-                iconStyle={settings.selectedIconStyle}
-                theme={isDark ? "bright" : (settings.selectedTheme as any)}
-                style={{
-                  backgroundColor: isDark ? "#1a1a2e" : "#f8fdf9",
-                  fontSize: `${settings.fontSize}px`,
-                  padding: "20px",
-                  borderRadius: "0.75rem",
-                  minHeight: "100%",
-                }}
-              />
+              {searchTerm && Object.keys(displayJson).length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                  <Search className="h-12 w-12 text-muted-foreground/30 mb-3" />
+                  <p className="text-muted-foreground font-medium">No matches found</p>
+                  <p className="text-sm text-muted-foreground/60 mt-1">
+                    Try a different search term
+                  </p>
+                </div>
+              ) : (
+                <ReactJson
+                  src={displayJson}
+                  collapsed={false}
+                  enableClipboard={true}
+                  displayDataTypes={
+                    settings.selectedFormatterDataTypes === "true"
+                  }
+                  displayObjectSize={
+                    settings.selecteddisplayObjectSize === "true"
+                  }
+                  iconStyle={settings.selectedIconStyle}
+                  theme={isDark ? "bright" : (settings.selectedTheme as any)}
+                  style={{
+                    backgroundColor: isDark ? "#1a1a2e" : "#f8fdf9",
+                    fontSize: `${settings.fontSize}px`,
+                    padding: "20px",
+                    borderRadius: "0.75rem",
+                    minHeight: "100%",
+                  }}
+                />
+              )}
             </motion.div>
           ) : (
             <motion.div
