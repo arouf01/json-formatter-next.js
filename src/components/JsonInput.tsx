@@ -4,30 +4,32 @@ import {
   Sparkles,
   Trash2,
   ClipboardPaste,
-  Minimize2,
   Upload,
+  FileText,
 } from "lucide-react";
 
 interface JsonInputProps {
   value: string;
   onChange: (value: string) => void;
   onFormat: () => void;
-  onMinify: () => void;
   onClear: () => void;
   onPaste: () => void;
   onUploadFile: (file: File) => void;
   displayLayout: string;
+  titleValue: string;
+  onTitleChange: (value: string) => void;
 }
 
 export function JsonInput({
   value,
   onChange,
   onFormat,
-  onMinify,
   onClear,
   onPaste,
   onUploadFile,
   displayLayout,
+  titleValue,
+  onTitleChange,
 }: JsonInputProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -83,6 +85,16 @@ export function JsonInput({
           <span className="text-xs text-muted-foreground ml-auto">
             (Drag JSON file here)
           </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <FileText className="h-4 w-4 text-primary" />
+          <input
+            type="text"
+            value={titleValue}
+            onChange={(e) => onTitleChange(e.target.value)}
+            className="px-3 py-1 text-sm border border-border rounded-md bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50"
+            placeholder="Title"
+          />
         </div>
       </div>
 
@@ -155,21 +167,6 @@ export function JsonInput({
         >
           <Sparkles className="h-5 w-5" />
           Format
-        </motion.button>
-
-        <motion.button
-          onClick={onMinify}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px]"
-          style={{ background: "var(--gradient-secondary)" }}
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            visible: { opacity: 1, y: 0 },
-          }}
-          whileHover={{ scale: 1.03, y: -2 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          <Minimize2 className="h-5 w-5" />
-          Minify
         </motion.button>
 
         <motion.button

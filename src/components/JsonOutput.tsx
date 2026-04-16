@@ -296,7 +296,9 @@ export function JsonOutput({
               {searchTerm && Object.keys(displayJson).length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                   <Search className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-muted-foreground font-medium">No matches found</p>
+                  <p className="text-muted-foreground font-medium">
+                    No matches found
+                  </p>
                   <p className="text-sm text-muted-foreground/60 mt-1">
                     Try a different search term
                   </p>

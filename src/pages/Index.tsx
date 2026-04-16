@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const defaultSettings = {
   jsonInput: "",
+  jsonTitle: "",
   selectedTheme: "rjv-default",
   selectedFormatterDataTypes: "true",
   selecteddisplayObjectSize: "true",
@@ -32,6 +33,7 @@ const Index = () => {
   const { toast } = useToast();
 
   const [jsonInput, setJsonInput] = useState(defaultSettings.jsonInput);
+  const [jsonTitle, setJsonTitle] = useState(defaultSettings.jsonTitle);
   const [formattedJson, setFormattedJson] = useState("");
   const [parsedJson, setParsedJson] = useState<object | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,7 @@ const Index = () => {
       try {
         const parsed = JSON.parse(savedSettings);
         setJsonInput(parsed.jsonInput || "");
+        setJsonTitle(parsed.jsonTitle || "");
         setSettings({
           ...defaultSettings,
           ...parsed,
@@ -77,6 +80,7 @@ const Index = () => {
     const settingsToSave = {
       ...settings,
       jsonInput,
+      jsonTitle,
     };
     localStorage.setItem(
       "jsonFormatterSettings",
@@ -89,6 +93,7 @@ const Index = () => {
   const clearSettings = () => {
     localStorage.removeItem("jsonFormatterSettings");
     setJsonInput(defaultSettings.jsonInput);
+    setJsonTitle(defaultSettings.jsonTitle);
     setSettings(defaultSettings);
     setFormattedJson("");
     setParsedJson(null);
@@ -105,11 +110,27 @@ const Index = () => {
   const handleParsedJsonContent = (content: string) => {
     try {
       const parsed = JSON.parse(content);
-      setJsonInput(content);
-      setFormattedJson(JSON.stringify(parsed, null, 2));
-      setParsedJson(parsed);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        "title" in parsed &&
+        "data" in parsed
+      ) {
+        // Embedded title and data
+        setJsonTitle(parsed.title || "");
+        setJsonInput(JSON.stringify(parsed.data, null, 2));
+        setFormattedJson(JSON.stringify(parsed.data, null, 2));
+        setParsedJson(parsed.data);
+      } else {
+        // Normal JSON
+        setJsonTitle("");
+        setJsonInput(content);
+        setFormattedJson(JSON.stringify(parsed, null, 2));
+        setParsedJson(parsed);
+      }
       setError(null);
     } catch {
+      setJsonTitle("");
       setJsonInput(content);
       setFormattedJson("");
       setParsedJson(null);
@@ -190,32 +211,13 @@ const Index = () => {
     }
   };
 
-  const minifyJSON = () => {
-    if (parsedJson) {
-      const minified = JSON.stringify(parsedJson);
-      setJsonInput(minified);
-      setFormattedJson(minified);
-      // Keep parsedJson the same for display
-    } else {
-      try {
-        const parsed = JSON.parse(jsonInput);
-        const minified = JSON.stringify(parsed);
-        setJsonInput(minified);
-        setFormattedJson(minified);
-        setParsedJson(parsed);
-        setError(null);
-      } catch {
-        setError("Invalid JSON");
-      }
-    }
-  };
-
   const downloadJSON = () => {
     if (parsedJson) {
-      const dataStr = JSON.stringify(parsedJson, null, 2);
+      const dataToDownload = { title: jsonTitle, data: parsedJson };
+      const dataStr = JSON.stringify(dataToDownload, null, 2);
       const dataUri =
         "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-      const exportFileDefaultName = "formatted.json";
+      const exportFileDefaultName = `${jsonTitle || "response"} - by json.a1zohosolutions.com.json`;
       const linkElement = document.createElement("a");
       linkElement.setAttribute("href", dataUri);
       linkElement.setAttribute("download", exportFileDefaultName);
@@ -329,11 +331,12 @@ const Index = () => {
             value={jsonInput}
             onChange={handleInputChange}
             onFormat={formatJSON}
-            onMinify={minifyJSON}
             onClear={clearInput}
             onPaste={pasteFromClipboard}
             onUploadFile={handleFileUpload}
             displayLayout={settings.displayLayout}
+            titleValue={jsonTitle}
+            onTitleChange={setJsonTitle}
           />
 
           <JsonOutput
