@@ -9,6 +9,7 @@ import { JsonOutput } from "@/components/JsonOutput";
 import { ErrorAlert } from "@/components/ErrorAlert";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcutsHelp";
+import { useToast } from "@/hooks/use-toast";
 
 const defaultSettings = {
   jsonInput: "",
@@ -28,6 +29,7 @@ interface HistoryItem {
 
 const Index = () => {
   const { isDark, toggleTheme } = useTheme();
+  const { toast } = useToast();
 
   const [jsonInput, setJsonInput] = useState(defaultSettings.jsonInput);
   const [formattedJson, setFormattedJson] = useState("");
@@ -93,6 +95,88 @@ const Index = () => {
     setError(null);
   };
 
+  const MAX_JSON_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+  const isJsonFile = (file: File) => {
+    const fileName = file.name.toLowerCase();
+    return file.type === "application/json" || fileName.endsWith(".json");
+  };
+
+  const handleParsedJsonContent = (content: string) => {
+    try {
+      const parsed = JSON.parse(content);
+      setJsonInput(content);
+      setFormattedJson(JSON.stringify(parsed, null, 2));
+      setParsedJson(parsed);
+      setError(null);
+    } catch {
+      setJsonInput(content);
+      setFormattedJson("");
+      setParsedJson(null);
+      setError("Invalid JSON");
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    if (!isJsonFile(file)) {
+      const message =
+        "Please upload a file with a .json extension or valid JSON mime type.";
+      setError(message);
+      toast({
+        title: "Upload error",
+        description: message,
+        variant: "destructive",
+      });
+      setParsedJson(null);
+      setFormattedJson("");
+      return;
+    }
+
+    if (file.size > MAX_JSON_FILE_SIZE) {
+      const message =
+        "JSON file is too large. Please upload a file smaller than 5MB.";
+      setError(message);
+      toast({
+        title: "Upload error",
+        description: message,
+        variant: "destructive",
+      });
+      setParsedJson(null);
+      setFormattedJson("");
+      return;
+    }
+
+    try {
+      const fileContent = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const content = reader.result;
+          if (typeof content === "string") {
+            resolve(content);
+          } else {
+            reject(new Error("Unable to read file content."));
+          }
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file);
+      });
+
+      handleParsedJsonContent(fileContent);
+    } catch (err) {
+      console.error("Failed to load JSON file:", err);
+      const message =
+        "Unable to read the uploaded file. Please try another JSON file.";
+      setError(message);
+      toast({
+        title: "Upload error",
+        description: message,
+        variant: "destructive",
+      });
+      setParsedJson(null);
+      setFormattedJson("");
+    }
+  };
+
   const formatJSON = () => {
     try {
       const parsed = JSON.parse(jsonInput);
@@ -129,11 +213,12 @@ const Index = () => {
   const downloadJSON = () => {
     if (parsedJson) {
       const dataStr = JSON.stringify(parsedJson, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const exportFileDefaultName = 'formatted.json';
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
+      const dataUri =
+        "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+      const exportFileDefaultName = "formatted.json";
+      const linkElement = document.createElement("a");
+      linkElement.setAttribute("href", dataUri);
+      linkElement.setAttribute("download", exportFileDefaultName);
       linkElement.click();
     }
   };
@@ -247,6 +332,7 @@ const Index = () => {
             onMinify={minifyJSON}
             onClear={clearInput}
             onPaste={pasteFromClipboard}
+            onUploadFile={handleFileUpload}
             displayLayout={settings.displayLayout}
           />
 

@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Trash2, ClipboardPaste, Minimize2, Upload } from "lucide-react";
+import {
+  Sparkles,
+  Trash2,
+  ClipboardPaste,
+  Minimize2,
+  Upload,
+} from "lucide-react";
 
 interface JsonInputProps {
   value: string;
@@ -9,6 +15,7 @@ interface JsonInputProps {
   onMinify: () => void;
   onClear: () => void;
   onPaste: () => void;
+  onUploadFile: (file: File) => void;
   displayLayout: string;
 }
 
@@ -19,9 +26,11 @@ export function JsonInput({
   onMinify,
   onClear,
   onPaste,
+  onUploadFile,
   displayLayout,
 }: JsonInputProps) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -39,21 +48,20 @@ export function JsonInput({
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
-      if (file.type === "application/json" || file.name.endsWith(".json")) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const content = event.target?.result as string;
-            onChange(content);
-          } catch (err) {
-            console.error("Error reading file:", err);
-          }
-        };
-        reader.readAsText(file);
-      } else {
-        alert("Please drop a valid JSON file");
-      }
+      onUploadFile(file);
     }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onUploadFile(file);
+    }
+    e.target.value = "";
+  };
+
+  const triggerUpload = () => {
+    fileInputRef.current?.click();
   };
   return (
     <motion.div
@@ -86,13 +94,20 @@ export function JsonInput({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
+        <input
+          type="file"
+          accept=".json,application/json"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleFileInputChange}
+        />
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={`w-full h-full border-2 border-border p-4 rounded-xl font-mono text-sm bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all duration-200 placeholder:text-muted-foreground resize-none ${
             displayLayout === "side-by-side" ? "min-h-[350px]" : "min-h-[200px]"
           } ${isDragOver ? "border-primary/50 bg-primary/5" : ""}`}
-          placeholder='Paste JSON here (e.g., {"key": "value"}) or drag a JSON file'
+          placeholder='Paste JSON here (e.g., {"key": "value"}), upload, or drag a JSON file'
         />
 
         {isDragOver && (
@@ -169,6 +184,21 @@ export function JsonInput({
         >
           <Trash2 className="h-5 w-5" />
           Clear
+        </motion.button>
+
+        <motion.button
+          onClick={triggerUpload}
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px]"
+          style={{ background: "var(--gradient-secondary)" }}
+          variants={{
+            hidden: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0 },
+          }}
+          whileHover={{ scale: 1.03, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <Upload className="h-5 w-5" />
+          Upload
         </motion.button>
 
         <motion.button
