@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactJson from "react-json-view";
 import gojoRunning from "@/assets/gojo_running.gif";
+import { DotLoader } from "./DotLoader";
 import {
   CheckCircle2,
   FileJson2,
@@ -261,24 +262,31 @@ export function JsonOutput({
               className="flex flex-col items-center justify-center h-full p-8"
             >
               <motion.div
-                className="mb-6"
-                animate={{ y: [0, -12, 0] }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                className={`flex items-center justify-center ${!isDark ? "mb-6" : ""}`}
               >
-                <motion.img
-                  src={gojoRunning}
-                  alt="Gojo running"
-                  className="w-40 h-auto"
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
+                {isDark ? (
+                  <DotLoader />
+                ) : (
+                  <motion.div
+                    animate={{ y: [0, -12, 0] }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <motion.img
+                      src={gojoRunning}
+                      alt="Gojo running"
+                      className="w-40 h-auto"
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+                  </motion.div>
+                )}
               </motion.div>
 
               <motion.p
@@ -286,10 +294,14 @@ export function JsonOutput({
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 Formatting your JSON...
-                <br />
-                <span className="text-sm opacity-75">
-                  Gojo's on the run - just a moment.
-                </span>
+                {!isDark && (
+                  <>
+                    <br />
+                    <span className="text-sm opacity-75">
+                      Gojo's on the run - just a moment.
+                    </span>
+                  </>
+                )}
               </motion.p>
             </motion.div>
           ) : parsedJson ? (
