@@ -199,7 +199,7 @@ export function JsonOutput({
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search keys or values..."
+              placeholder="Search keys..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-sm text-foreground focus:outline-none placeholder:text-muted-foreground"
