@@ -68,6 +68,14 @@ export function JsonOutput({
     const term_lower = term.toLowerCase();
     let matchCount = 0;
 
+    const matchesValue = (value: any) => {
+      if (value === undefined) return false;
+      if (value === null)
+        return String(value).toLowerCase().includes(term_lower);
+      if (typeof value === "object") return false;
+      return String(value).toLowerCase().includes(term_lower);
+    };
+
     const filter = (o: any): any => {
       if (o === null || o === undefined) return undefined;
 
@@ -82,30 +90,21 @@ export function JsonOutput({
 
         for (const [key, value] of Object.entries(o)) {
           const keyMatches = key.toLowerCase().includes(term_lower);
+          const valueMatches = matchesValue(value);
           const filteredValue = filter(value);
 
-          if (keyMatches) {
+          if (keyMatches || valueMatches) {
             matchCount++;
             result[key] = value;
             hasMatch = true;
           } else if (filteredValue !== undefined) {
             result[key] = filteredValue;
             hasMatch = true;
-          } else if (
-            typeof value === "string" &&
-            value.toLowerCase().includes(term_lower)
-          ) {
-            matchCount++;
-            result[key] = value;
-            hasMatch = true;
           }
         }
 
         return hasMatch ? result : undefined;
-      } else if (
-        typeof o === "string" &&
-        o.toLowerCase().includes(term_lower)
-      ) {
+      } else if (matchesValue(o)) {
         matchCount++;
         return o;
       }
@@ -199,7 +198,7 @@ export function JsonOutput({
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search keys..."
+              placeholder="Search keys or values..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-sm text-foreground focus:outline-none placeholder:text-muted-foreground"
