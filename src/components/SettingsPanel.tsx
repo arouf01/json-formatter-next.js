@@ -20,16 +20,32 @@ export function SettingsPanel({
       {/* Trigger Button */}
       <motion.button
         onClick={onToggle}
-        className="flex items-center gap-2 py-1.5 px-3 md:px-5 md:py-2.5 rounded-sm md:rounded-xl border border-border bg-card text-primary font-medium shadow-card hover:bg-accent"
+        aria-label="Display settings"
+        aria-expanded={isOpen}
+        className="flex items-center gap-2 py-1.5 px-3 md:px-5 md:py-2.5 rounded-sm md:rounded-xl border border-border bg-card text-primary font-medium shadow-card hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       >
         <Settings2 className="h-5 w-5" />
         <span className="text-xs md:text-lg">Display Settings</span>
       </motion.button>
 
-      {/* Sidebar */}
+      {/* Backdrop + Sidebar */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            key="settings-backdrop"
+            className="fixed inset-0 z-30 bg-black/20 backdrop-blur-[1px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onToggle}
+            aria-hidden="true"
+          />
+        )}
+        {isOpen && (
+          <motion.div
+            key="settings-panel"
+            role="dialog"
+            aria-label="Display settings"
             className="
         fixed right-4 top-20 z-40
         w-[250px]
@@ -52,7 +68,8 @@ export function SettingsPanel({
 
               <button
                 onClick={onToggle}
-                className="h-8 w-8 flex items-center justify-center rounded-md border border-border hover:bg-muted"
+                aria-label="Close settings"
+                className="h-8 w-8 flex items-center justify-center rounded-md border border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -132,7 +149,8 @@ export function SettingsPanel({
                         Math.max(10, settings.fontSize - 1),
                       )
                     }
-                    className="flex-1 border rounded-lg"
+                    aria-label="Decrease font size"
+                    className="flex-1 border border-border rounded-lg py-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     −
                   </button>
@@ -143,7 +161,8 @@ export function SettingsPanel({
                         Math.min(72, settings.fontSize + 1),
                       )
                     }
-                    className="flex-1 border rounded-lg"
+                    aria-label="Increase font size"
+                    className="flex-1 border border-border rounded-lg py-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     +
                   </button>

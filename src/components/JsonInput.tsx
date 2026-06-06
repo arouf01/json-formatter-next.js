@@ -92,6 +92,7 @@ export function JsonInput({
             type="text"
             value={titleValue}
             onChange={(e) => onTitleChange(e.target.value)}
+            aria-label="JSON title"
             className="px-3 py-1 text-sm border border-border rounded-md bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 w-full"
             placeholder="Title"
           />
@@ -116,6 +117,8 @@ export function JsonInput({
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          aria-label="JSON input"
+          spellCheck={false}
           className={`w-full h-full border-2 border-border p-4 rounded-xl font-mono text-sm bg-input-bg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all duration-200 placeholder:text-muted-foreground resize-none ${
             displayLayout === "side-by-side" ? "min-h-[350px]" : "min-h-[200px]"
           } ${isDragOver ? "border-primary/50 bg-primary/5" : ""}`}
@@ -156,7 +159,7 @@ export function JsonInput({
       >
         <motion.button
           onClick={onFormat}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-primary-foreground shadow-button transition-all duration-300 min-w-[140px]"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-primary-foreground shadow-button transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-primary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },
@@ -171,7 +174,7 @@ export function JsonInput({
 
         <motion.button
           onClick={onClear}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-muted text-muted-foreground hover:bg-muted/80 shadow-lg transition-all duration-300 min-w-[140px]"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-muted text-muted-foreground hover:bg-muted/80 shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0 },
@@ -185,7 +188,7 @@ export function JsonInput({
 
         <motion.button
           onClick={triggerUpload}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px]"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-secondary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },
@@ -200,7 +203,7 @@ export function JsonInput({
 
         <motion.button
           onClick={onPaste}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px]"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-secondary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },

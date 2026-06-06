@@ -10,10 +10,10 @@ export function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
   return (
     <motion.button
       onClick={onToggle}
-      className="relative flex h-8 w-8 md:h-12 md:w-12 items-center justify-center rounded md:rounded-xl border border-border bg-card shadow-card transition-colors hover:bg-accent"
+      className="relative flex h-8 w-8 md:h-12 md:w-12 items-center justify-center rounded md:rounded-xl border border-border bg-card shadow-card transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      aria-label="Toggle theme"
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
     >
       <motion.div
         initial={false}

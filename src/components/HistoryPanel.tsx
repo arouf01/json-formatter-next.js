@@ -61,7 +61,9 @@ export function HistoryPanel({
                 e.preventDefault();
                 onClear();
               }}
-              className="text-xs text-destructive hover:text-destructive/80"
+              aria-label="Clear history"
+              title="Clear history"
+              className="text-xs text-destructive hover:text-destructive/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 rounded"
             >
               <Trash2 className="h-4 w-4" />
             </button>

@@ -43,14 +43,15 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <motion.div
-            className="fixed left-1/2 top-1/2 z-50 w-96 max-w-[90vw] rounded-2xl bg-card border border-border shadow-xl p-6"
-            initial={{ opacity: 0, scale: 0.9, y: -50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -50 }}
-            style={{ transform: "translate(-50%, -50%)" }}
-          >
+          {/* Centering wrapper */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            {/* Modal */}
+            <motion.div
+              className="pointer-events-auto w-96 max-w-[90vw] max-h-[85vh] overflow-y-auto rounded-2xl bg-card border border-border shadow-xl p-6"
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+            >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
@@ -97,7 +98,8 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
             >
               Got it!
             </motion.button>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactJson from "react-json-view";
-import gojoRunning from "@/assets/gojo_running.gif";
 import { DotLoader } from "./DotLoader";
 import {
   CheckCircle2,
@@ -9,6 +8,10 @@ import {
   AlertCircle,
   Download,
   Search,
+  Copy,
+  Minimize2,
+  ChevronsDownUp,
+  ChevronsUpDown,
 } from "lucide-react";
 
 interface JsonOutputProps {
@@ -24,6 +27,8 @@ interface JsonOutputProps {
   isDark: boolean;
   isLoading: boolean;
   onDownload: () => void;
+  onCopy: () => void;
+  onMinify: () => void;
 }
 
 export function JsonOutput({
@@ -33,9 +38,31 @@ export function JsonOutput({
   isDark,
   isLoading,
   onDownload,
+  onCopy,
+  onMinify,
 }: JsonOutputProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  // Debounce the search term so filtering doesn't run on every keystroke.
+  const [debouncedTerm, setDebouncedTerm] = useState("");
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedTerm(searchTerm), 200);
+    return () => clearTimeout(id);
+  }, [searchTerm]);
+
   const isValid = parsedJson !== null;
+
+  // Expand/collapse-all. react-json-view caches expansion internally, so we
+  // bump a key to force it to re-apply the new collapsed level on each click.
+  const [collapsed, setCollapsed] = useState<boolean | number>(false);
+  const [treeKey, setTreeKey] = useState(0);
+  const expandAll = () => {
+    setCollapsed(false);
+    setTreeKey((k) => k + 1);
+  };
+  const collapseAll = () => {
+    setCollapsed(1);
+    setTreeKey((k) => k + 1);
+  };
 
   // Calculate JSON statistics
   const calculateStats = (obj: any) => {
@@ -59,7 +86,10 @@ export function JsonOutput({
     return { keyCount, arrayCount, depth };
   };
 
-  const stats = parsedJson ? calculateStats(parsedJson) : null;
+  const stats = useMemo(
+    () => (parsedJson ? calculateStats(parsedJson) : null),
+    [parsedJson],
+  );
 
   // Filter JSON based on search term
   const filterJson = (obj: any, term: string): any => {
@@ -116,7 +146,11 @@ export function JsonOutput({
     return { filtered: filtered || {}, matchCount };
   };
 
-  const searchResult = searchTerm ? filterJson(parsedJson, searchTerm) : null;
+  const searchResult = useMemo(
+    () =>
+      debouncedTerm && parsedJson ? filterJson(parsedJson, debouncedTerm) : null,
+    [debouncedTerm, parsedJson],
+  );
   const displayJson = searchResult?.filtered || parsedJson;
   const matchCount = searchResult?.matchCount || 0;
 
@@ -172,17 +206,39 @@ export function JsonOutput({
           </AnimatePresence>
 
           {parsedJson && (
-            <motion.button
-              onClick={onDownload}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 transition-all duration-200"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Download className="h-4 w-4 text-secondary" />
-              <span className="text-xs font-medium text-secondary">
-                Download
-              </span>
-            </motion.button>
+            <>
+              <motion.button
+                onClick={onCopy}
+                aria-label="Copy formatted JSON"
+                title="Copy formatted JSON"
+                className="flex items-center justify-center h-8 w-8 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Copy className="h-4 w-4 text-secondary" />
+              </motion.button>
+              <motion.button
+                onClick={onMinify}
+                aria-label="Copy minified JSON"
+                title="Copy minified JSON"
+                className="flex items-center justify-center h-8 w-8 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Minimize2 className="h-4 w-4 text-secondary" />
+              </motion.button>
+              <motion.button
+                onClick={onDownload}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Download className="h-4 w-4 text-secondary" />
+                <span className="text-xs font-medium text-secondary">
+                  Download
+                </span>
+              </motion.button>
+            </>
           )}
         </div>
       </div>
@@ -199,11 +255,12 @@ export function JsonOutput({
             <input
               type="text"
               placeholder="Search keys or values..."
+              aria-label="Search JSON keys or values"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-sm text-foreground focus:outline-none placeholder:text-muted-foreground"
             />
-            {searchTerm && (
+            {debouncedTerm && (
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -215,7 +272,8 @@ export function JsonOutput({
             {searchTerm && (
               <motion.button
                 onClick={() => setSearchTerm("")}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Clear search"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50 rounded"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -226,21 +284,44 @@ export function JsonOutput({
         </motion.div>
       )}
 
-      {/* Statistics */}
+      {/* Statistics & tree controls */}
       {stats && (
         <motion.div
-          className="mb-3 flex flex-wrap gap-2 text-xs"
+          className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <div className="px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
-            Keys: {stats.keyCount}
+          <div className="flex flex-wrap gap-2">
+            <div className="px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
+              Keys: {stats.keyCount}
+            </div>
+            <div className="px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary">
+              Arrays: {stats.arrayCount}
+            </div>
+            <div className="px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent-foreground">
+              Depth: {stats.depth}
+            </div>
           </div>
-          <div className="px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary">
-            Arrays: {stats.arrayCount}
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent-foreground">
-            Depth: {stats.depth}
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={expandAll}
+              aria-label="Expand all"
+              title="Expand all"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 text-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+            >
+              <ChevronsUpDown className="h-3.5 w-3.5" />
+              Expand
+            </button>
+            <button
+              onClick={collapseAll}
+              aria-label="Collapse all"
+              title="Collapse all"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-secondary/10 hover:bg-secondary/20 border border-secondary/20 text-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50"
+            >
+              <ChevronsDownUp className="h-3.5 w-3.5" />
+              Collapse
+            </button>
           </div>
         </motion.div>
       )}
@@ -258,50 +339,12 @@ export function JsonOutput({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-full p-8"
+              className="flex flex-col items-center justify-center h-full p-8 gap-6"
             >
-              <motion.div
-                className={`flex items-center justify-center ${!isDark ? "mb-6" : ""}`}
-              >
-                {isDark ? (
-                  <DotLoader />
-                ) : (
-                  <motion.div
-                    animate={{ y: [0, -12, 0] }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <motion.img
-                      src={gojoRunning}
-                      alt="Gojo running"
-                      className="w-40 h-auto"
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    />
-                  </motion.div>
-                )}
-              </motion.div>
-
-              <motion.p
-                className="text-muted-foreground font-medium text-center"
-                transition={{ duration: 1, repeat: Infinity }}
-              >
+              <DotLoader />
+              <p className="text-muted-foreground font-medium text-center">
                 Formatting your JSON...
-                {!isDark && (
-                  <>
-                    <br />
-                    <span className="text-sm opacity-75">
-                      Gojo's on the run - just a moment.
-                    </span>
-                  </>
-                )}
-              </motion.p>
+              </p>
             </motion.div>
           ) : parsedJson ? (
             <motion.div
@@ -311,7 +354,7 @@ export function JsonOutput({
               exit={{ opacity: 0 }}
               className="h-full"
             >
-              {searchTerm && Object.keys(displayJson).length === 0 ? (
+              {debouncedTerm && Object.keys(displayJson).length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                   <Search className="h-12 w-12 text-muted-foreground/30 mb-3" />
                   <p className="text-muted-foreground font-medium">
@@ -323,8 +366,9 @@ export function JsonOutput({
                 </div>
               ) : (
                 <ReactJson
+                  key={treeKey}
                   src={displayJson}
-                  collapsed={false}
+                  collapsed={collapsed}
                   enableClipboard={true}
                   displayDataTypes={
                     settings.selectedFormatterDataTypes === "true"
@@ -333,7 +377,11 @@ export function JsonOutput({
                     settings.selecteddisplayObjectSize === "true"
                   }
                   iconStyle={settings.selectedIconStyle}
-                  theme={isDark ? "bright" : (settings.selectedTheme as any)}
+                  theme={
+                    (isDark && settings.selectedTheme === "rjv-default"
+                      ? "bright"
+                      : settings.selectedTheme) as any
+                  }
                   style={{
                     backgroundColor: isDark ? "#1a1a2e" : "#f8fdf9",
                     fontSize: `${settings.fontSize}px`,
