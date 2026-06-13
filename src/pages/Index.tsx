@@ -177,7 +177,8 @@ const Index = () => {
         dataToShow = parsed.data;
       }
       const pretty = JSON.stringify(dataToShow, null, 2);
-      setJsonInput(pretty);
+      // Only the output reflects the formatted JSON; the input keeps the
+      // raw source the user typed/pasted/uploaded.
       setFormattedJson(pretty);
       setParsedJson(dataToShow as object);
       setError(null);
@@ -241,6 +242,7 @@ const Index = () => {
         });
         return;
       }
+      setJsonInput(fileContent);
       processJsonString(fileContent);
     } catch (err) {
       console.error("Failed to load JSON file:", err);
@@ -371,6 +373,7 @@ const Index = () => {
 
   const loadFromHistory = useCallback(
     (json: string) => {
+      setJsonInput(json);
       processJsonString(json);
     },
     [processJsonString],
