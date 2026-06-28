@@ -4,98 +4,99 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 270 50% 15%;
+    /* A1 Zoho Solutions brand palette */
+    --background: 0 0% 100%;
+    --foreground: 252 57% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 270 50% 15%;
+    --card-foreground: 252 57% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 270 50% 15%;
+    --popover-foreground: 252 57% 12%;
 
-    --primary: 271 80% 43%;
+    --primary: 19 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 84% 39%;
+    --secondary: 268 79% 40%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 270 20% 95%;
-    --muted-foreground: 270 10% 45%;
+    --muted: 252 30% 96%;
+    --muted-foreground: 252 12% 42%;
 
-    --accent: 271 80% 95%;
-    --accent-foreground: 271 80% 43%;
+    --accent: 268 60% 95%;
+    --accent-foreground: 268 79% 40%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 39%;
+    --success: 134 48% 44%;
     --success-foreground: 0 0% 100%;
 
-    --border: 270 20% 90%;
-    --input: 270 20% 90%;
-    --ring: 271 80% 43%;
+    --border: 252 20% 90%;
+    --input: 252 20% 90%;
+    --ring: 19 100% 50%;
 
     --radius: 0.75rem;
 
     /* Custom JSON Formatter tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(271, 80%, 43%) 0%, hsl(271, 80%, 55%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(160, 84%, 39%) 0%, hsl(160, 84%, 50%) 100%);
-    --gradient-surface: linear-gradient(135deg, hsl(270, 20%, 98%) 0%, hsl(270, 20%, 95%) 100%);
-    
-    --shadow-glow-primary: 0 0 40px hsla(271, 80%, 43%, 0.15);
-    --shadow-glow-secondary: 0 0 40px hsla(160, 84%, 39%, 0.15);
-    --shadow-card: 0 4px 24px hsla(270, 50%, 15%, 0.08);
-    --shadow-button: 0 4px 16px hsla(271, 80%, 43%, 0.25);
+    --gradient-primary: linear-gradient(135deg, #FF4F00 0%, #6518B6 55%, #332078 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(268, 79%, 40%) 0%, hsl(268, 70%, 55%) 100%);
+    --gradient-surface: linear-gradient(135deg, hsl(252, 30%, 98%) 0%, hsl(252, 30%, 96%) 100%);
+
+    --shadow-glow-primary: 0 0 40px hsla(19, 100%, 50%, 0.15);
+    --shadow-glow-secondary: 0 0 40px hsla(268, 79%, 40%, 0.15);
+    --shadow-card: 0 4px 24px hsla(252, 57%, 12%, 0.08);
+    --shadow-button: 0 4px 16px hsla(19, 100%, 50%, 0.25);
 
     --input-bg: 0 0% 100%;
-    --output-bg: 160 40% 98%;
-    --json-viewer-bg: 160 30% 97%;
+    --output-bg: 252 30% 98%;
+    --json-viewer-bg: 252 30% 97%;
   }
 
   .dark {
-    --background: 270 30% 8%;
-    --foreground: 0 0% 95%;
+    --background: 240 16% 7%;
+    --foreground: 0 0% 100%;
 
-    --card: 270 25% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 240 18% 11%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 270 25% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 240 18% 11%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 271 80% 60%;
+    --primary: 19 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 84% 45%;
+    --secondary: 268 70% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 270 20% 18%;
-    --muted-foreground: 270 10% 60%;
+    --muted: 240 14% 16%;
+    --muted-foreground: 240 8% 65%;
 
-    --accent: 271 50% 20%;
-    --accent-foreground: 271 80% 70%;
+    --accent: 268 40% 22%;
+    --accent-foreground: 268 70% 80%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 45%;
+    --success: 134 48% 44%;
     --success-foreground: 0 0% 100%;
 
-    --border: 270 20% 20%;
-    --input: 270 20% 20%;
-    --ring: 271 80% 60%;
+    --border: 240 12% 20%;
+    --input: 240 12% 20%;
+    --ring: 19 100% 50%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(271, 80%, 55%) 0%, hsl(271, 80%, 65%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(160, 84%, 45%) 0%, hsl(160, 84%, 55%) 100%);
-    --gradient-surface: linear-gradient(135deg, hsl(270, 25%, 10%) 0%, hsl(270, 25%, 8%) 100%);
-    
-    --shadow-glow-primary: 0 0 60px hsla(271, 80%, 55%, 0.2);
-    --shadow-glow-secondary: 0 0 60px hsla(160, 84%, 45%, 0.2);
+    --gradient-primary: linear-gradient(135deg, #FF4F00 0%, #6518B6 55%, #332078 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(268, 70%, 55%) 0%, hsl(268, 70%, 65%) 100%);
+    --gradient-surface: linear-gradient(135deg, hsl(240, 18%, 11%) 0%, hsl(240, 16%, 7%) 100%);
+
+    --shadow-glow-primary: 0 0 60px hsla(19, 100%, 50%, 0.2);
+    --shadow-glow-secondary: 0 0 60px hsla(268, 70%, 55%, 0.2);
     --shadow-card: 0 4px 24px hsla(0, 0%, 0%, 0.3);
-    --shadow-button: 0 4px 20px hsla(271, 80%, 55%, 0.35);
+    --shadow-button: 0 4px 20px hsla(19, 100%, 50%, 0.35);
 
-    --input-bg: 270 25% 15%;
-    --output-bg: 160 20% 12%;
-    --json-viewer-bg: 220 20% 13%;
+    --input-bg: 240 18% 13%;
+    --output-bg: 240 16% 10%;
+    --json-viewer-bg: 240 18% 11%;
   }
 }
 
@@ -175,7 +176,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    hsla(271, 80%, 60%, 0.1) 50%,
+    hsla(19, 100%, 50%, 0.1) 50%,
     transparent 100%
   );
   background-size: 200% 100%;

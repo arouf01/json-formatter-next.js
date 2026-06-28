@@ -34,7 +34,7 @@ export function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
         initial={false}
         animate={{
           boxShadow: isDark
-            ? "0 0 20px hsla(271, 80%, 60%, 0.3)"
+            ? "0 0 20px hsla(19, 100%, 50%, 0.3)"
             : "0 0 20px hsla(40, 100%, 60%, 0.3)",
         }}
         transition={{ duration: 0.3 }}
