@@ -1,27 +1,13 @@
-import { useState, useEffect } from "react";
+import { useThemeControl } from "@/components/ThemeProvider";
 
+/**
+ * Backward-compatible theme hook. The real state now lives in the A1 smart
+ * `ThemeProvider` (auto day/night mode + hourly brand rotation, or a manual
+ * choice once the visitor picks one). This just exposes the light/dark slice
+ * the existing UI expects; toggling flips to a manual choice and disables the
+ * automation, exactly like A1's theme toggle.
+ */
 export function useTheme() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("theme");
-      if (saved) return saved === "dark";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => setIsDark(!isDark);
-
+  const { isDark, toggleTheme } = useThemeControl();
   return { isDark, toggleTheme };
 }

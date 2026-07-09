@@ -64,7 +64,112 @@
     />
 
     <!-- Theme Color -->
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#3386FE" />
+
+    <!-- Smart theme (A1 Zoho Solutions): applies the brand color + light/dark
+         mode BEFORE first paint so there's no flash. Auto = light by day /
+         dark by night, brand color rotates hourly, until the visitor picks a
+         color or mode (then their choice is persisted). Kept in sync with
+         src/lib/theme.ts (THEME_FOUC_SCRIPT). -->
+    <script>
+      (function () {
+        try {
+          var K = {
+            auto: "theme-auto",
+            color: "brand-primary",
+            mode: "theme-mode",
+          };
+          var P = [
+            "#3386FE",
+            "#6366F1",
+            "#8B5CF6",
+            "#06B6D4",
+            "#10B981",
+            "#F43F5E",
+            "#F59E0B",
+          ];
+          var D = "#3386FE";
+          function ls(k) {
+            try {
+              var v = localStorage.getItem(k);
+              if (v != null) return v;
+            } catch (e) {}
+            var m = document.cookie.match(
+              new RegExp("(?:^|; )" + k + "=([^;]+)")
+            );
+            return m ? decodeURIComponent(m[1]) : null;
+          }
+          function toHsl(x) {
+            var h = x.replace("#", "");
+            if (h.length === 3)
+              h = h
+                .split("")
+                .map(function (c) {
+                  return c + c;
+                })
+                .join("");
+            var r = parseInt(h.slice(0, 2), 16) / 255,
+              g = parseInt(h.slice(2, 4), 16) / 255,
+              b = parseInt(h.slice(4, 6), 16) / 255;
+            var mx = Math.max(r, g, b),
+              mn = Math.min(r, g, b),
+              hu = 0,
+              sa = 0,
+              li = (mx + mn) / 2;
+            if (mx !== mn) {
+              var d = mx - mn;
+              sa = li > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+              if (mx === r) hu = (g - b) / d + (g < b ? 6 : 0);
+              else if (mx === g) hu = (b - r) / d + 2;
+              else hu = (r - g) / d + 4;
+              hu /= 6;
+            }
+            return [
+              Math.round(hu * 360),
+              Math.round(sa * 100),
+              Math.round(li * 100),
+            ];
+          }
+          function light(x) {
+            var h = x.replace("#", "");
+            if (h.length === 3)
+              h = h
+                .split("")
+                .map(function (c) {
+                  return c + c;
+                })
+                .join("");
+            var r = parseInt(h.slice(0, 2), 16),
+              g = parseInt(h.slice(2, 4), 16),
+              b = parseInt(h.slice(4, 6), 16);
+            return (r * 299 + g * 587 + b * 114) / 1000 > 150;
+          }
+          var auto = ls(K.auto) !== "false",
+            hex,
+            mode;
+          if (auto) {
+            var hr = new Date().getHours();
+            hex = P[((hr % P.length) + P.length) % P.length];
+            mode = hr >= 6 && hr < 18 ? "light" : "dark";
+          } else {
+            hex = ls(K.color) || D;
+            mode = ls(K.mode) || "dark";
+          }
+          var hsl = toHsl(hex),
+            s = document.documentElement;
+          s.style.setProperty("--primary-h", hsl[0]);
+          s.style.setProperty("--primary-s", hsl[1] + "%");
+          s.style.setProperty("--primary-l", hsl[2] + "%");
+          s.style.setProperty(
+            "--primary-foreground",
+            light(hex) ? "216 40% 14%" : "0 0% 100%"
+          );
+          if (mode === "dark") s.classList.add("dark");
+          else s.classList.remove("dark");
+          s.style.colorScheme = mode;
+        } catch (e) {}
+      })();
+    </script>
 
     <!-- Schema -->
     <script type="application/ld+json">

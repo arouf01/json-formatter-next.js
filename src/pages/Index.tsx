@@ -20,7 +20,7 @@ const defaultSettings = {
   selecteddisplayObjectSize: "true",
   selectedIconStyle: "triangle" as const,
   fontSize: 16,
-  displayLayout: "side-by-side",
+  displayLayout: "up-down",
 };
 
 interface HistoryItem {

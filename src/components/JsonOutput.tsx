@@ -383,7 +383,7 @@ export function JsonOutput({
                       : settings.selectedTheme) as any
                   }
                   style={{
-                    backgroundColor: isDark ? "#13131a" : "#f7f6fb",
+                    backgroundColor: isDark ? "#0d1119" : "#f4f8fd",
                     fontSize: `${settings.fontSize}px`,
                     padding: "20px",
                     borderRadius: "0.75rem",

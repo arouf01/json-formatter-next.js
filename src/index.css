@@ -4,99 +4,154 @@
 
 @layer base {
   :root {
-    /* A1 Zoho Solutions brand palette */
-    --background: 0 0% 100%;
-    --foreground: 252 57% 12%;
+    /* ── Brand color ──────────────────────────────────────────────────────
+       Single source of truth (A1 Zoho Solutions). Default #3386FE ≈
+       hsl(214 99% 60%). The Theme Color Picker / hourly rotation override only
+       these three; every brand color, gradient, ring, and accent below is
+       derived from them, so the whole app retints from one place. */
+    --primary-h: 214;
+    --primary-s: 99%;
+    --primary-l: 60%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 252 57% 12%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 252 57% 12%;
-
-    --primary: 19 100% 50%;
+    --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 268 79% 40%;
+    /* Secondary / accent stay in the brand family (follow the picker). */
+    --secondary: var(--primary-h) var(--primary-s) 46%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 252 30% 96%;
-    --muted-foreground: 252 12% 42%;
+    /* Accent is a subtle brand-tinted surface (readable foreground text). */
+    --accent: var(--primary-h) 60% 95%;
+    --accent-foreground: var(--primary-h) var(--primary-s) 38%;
 
-    --accent: 268 60% 95%;
-    --accent-foreground: 268 79% 40%;
+    /* Neutrals — cool, lightly blue-tinted; constant regardless of brand hue.
+       Background is a soft off-white so white cards gain subtle depth. */
+    --background: 214 44% 98%;
+    --foreground: 216 40% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 216 40% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 40% 14%;
+
+    --muted: 214 32% 96%;
+    --muted-foreground: 216 14% 44%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 134 48% 44%;
+    --success: 152 62% 40%;
     --success-foreground: 0 0% 100%;
 
-    --border: 252 20% 90%;
-    --input: 252 20% 90%;
-    --ring: 19 100% 50%;
+    --border: 214 28% 90%;
+    --input: 214 28% 90%;
+    --ring: var(--primary);
 
     --radius: 0.75rem;
 
-    /* Custom JSON Formatter tokens */
-    --gradient-primary: linear-gradient(135deg, #FF4F00 0%, #6518B6 55%, #332078 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(268, 79%, 40%) 0%, hsl(268, 70%, 55%) 100%);
-    --gradient-surface: linear-gradient(135deg, hsl(252, 30%, 98%) 0%, hsl(252, 30%, 96%) 100%);
+    /* Custom JSON Formatter tokens — retinted onto the brand ramp so they
+       follow the picker along with everything else. */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary-h) var(--primary-s) 60%) 0%,
+      hsl(var(--primary-h) var(--primary-s) 50%) 55%,
+      hsl(var(--primary-h) var(--primary-s) 38%) 100%
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      hsl(var(--primary-h) var(--primary-s) 46%) 0%,
+      hsl(var(--primary-h) var(--primary-s) 60%) 100%
+    );
+    --gradient-surface: linear-gradient(
+      135deg,
+      hsl(214 44% 99%) 0%,
+      hsl(214 32% 96%) 100%
+    );
 
-    --shadow-glow-primary: 0 0 40px hsla(19, 100%, 50%, 0.15);
-    --shadow-glow-secondary: 0 0 40px hsla(268, 79%, 40%, 0.15);
-    --shadow-card: 0 4px 24px hsla(252, 57%, 12%, 0.08);
-    --shadow-button: 0 4px 16px hsla(19, 100%, 50%, 0.25);
+    --shadow-glow-primary: 0 0 40px hsl(var(--primary-h) var(--primary-s) 60% / 0.15);
+    --shadow-glow-secondary: 0 0 40px hsl(var(--primary-h) var(--primary-s) 46% / 0.15);
+    --shadow-card: 0 4px 24px hsl(216 40% 14% / 0.08);
+    --shadow-button: 0 4px 16px hsl(var(--primary-h) var(--primary-s) 60% / 0.25);
 
     --input-bg: 0 0% 100%;
-    --output-bg: 252 30% 98%;
-    --json-viewer-bg: 252 30% 97%;
+    --output-bg: 214 44% 98%;
+    --json-viewer-bg: 214 32% 97%;
+
+    color-scheme: light;
   }
 
   .dark {
-    --background: 240 16% 7%;
-    --foreground: 0 0% 100%;
-
-    --card: 240 18% 11%;
-    --card-foreground: 0 0% 100%;
-
-    --popover: 240 18% 11%;
-    --popover-foreground: 0 0% 100%;
-
-    --primary: 19 100% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 268 70% 55%;
+    /* Dark mode — deep blue-black neutrals. Brand vars inherit from :root so
+       the selected primary stays identical across light and dark. */
+    --secondary: var(--primary-h) 90% 62%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 14% 16%;
-    --muted-foreground: 240 8% 65%;
+    --accent: var(--primary-h) 40% 22%;
+    --accent-foreground: var(--primary-h) 70% 80%;
 
-    --accent: 268 40% 22%;
-    --accent-foreground: 268 70% 80%;
+    --background: 216 42% 7%;
+    --foreground: 210 20% 98%;
+
+    --card: 216 38% 11%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 216 38% 11%;
+    --popover-foreground: 210 20% 98%;
+
+    --muted: 216 30% 16%;
+    --muted-foreground: 214 16% 66%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 134 48% 44%;
+    --success: 152 55% 48%;
     --success-foreground: 0 0% 100%;
 
-    --border: 240 12% 20%;
-    --input: 240 12% 20%;
-    --ring: 19 100% 50%;
+    --border: 216 26% 20%;
+    --input: 216 26% 20%;
+    --ring: var(--primary);
 
-    --gradient-primary: linear-gradient(135deg, #FF4F00 0%, #6518B6 55%, #332078 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(268, 70%, 55%) 0%, hsl(268, 70%, 65%) 100%);
-    --gradient-surface: linear-gradient(135deg, hsl(240, 18%, 11%) 0%, hsl(240, 16%, 7%) 100%);
+    --gradient-surface: linear-gradient(
+      135deg,
+      hsl(216 38% 11%) 0%,
+      hsl(216 42% 7%) 100%
+    );
 
-    --shadow-glow-primary: 0 0 60px hsla(19, 100%, 50%, 0.2);
-    --shadow-glow-secondary: 0 0 60px hsla(268, 70%, 55%, 0.2);
-    --shadow-card: 0 4px 24px hsla(0, 0%, 0%, 0.3);
-    --shadow-button: 0 4px 20px hsla(19, 100%, 50%, 0.35);
+    --shadow-glow-primary: 0 0 60px hsl(var(--primary-h) var(--primary-s) 60% / 0.2);
+    --shadow-glow-secondary: 0 0 60px hsl(var(--primary-h) var(--primary-s) 62% / 0.2);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
+    --shadow-button: 0 4px 20px hsl(var(--primary-h) var(--primary-s) 60% / 0.35);
 
-    --input-bg: 240 18% 13%;
-    --output-bg: 240 16% 10%;
-    --json-viewer-bg: 240 18% 11%;
+    --input-bg: 216 38% 13%;
+    --output-bg: 216 42% 9%;
+    --json-viewer-bg: 216 38% 11%;
+
+    color-scheme: dark;
+  }
+
+  /* Smooth cross-fade when the palette or light/dark mode changes. The class
+     is added by the theme controller only for ~360ms, so it never affects
+     normal interaction performance. */
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition:
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      color 0.35s ease,
+      fill 0.35s ease,
+      stroke 0.35s ease,
+      box-shadow 0.35s ease !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-transition,
+    .theme-transition *,
+    .theme-transition *::before,
+    .theme-transition *::after {
+      transition: none !important;
+    }
   }
 }
 
@@ -108,6 +163,10 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
   }
 }
 
@@ -176,7 +235,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    hsla(19, 100%, 50%, 0.1) 50%,
+    hsl(var(--primary-h) var(--primary-s) 60% / 0.1) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
