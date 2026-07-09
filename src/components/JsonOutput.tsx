@@ -12,6 +12,7 @@ import {
   Minimize2,
   ChevronsDownUp,
   ChevronsUpDown,
+  Wrench,
 } from "lucide-react";
 
 interface JsonOutputProps {
@@ -26,9 +27,11 @@ interface JsonOutputProps {
   displayLayout: string;
   isDark: boolean;
   isLoading: boolean;
+  error?: string | null;
   onDownload: () => void;
   onCopy: () => void;
   onMinify: () => void;
+  onFix?: () => void;
 }
 
 export function JsonOutput({
@@ -37,9 +40,11 @@ export function JsonOutput({
   displayLayout,
   isDark,
   isLoading,
+  error,
   onDownload,
   onCopy,
   onMinify,
+  onFix,
 }: JsonOutputProps) {
   const [searchTerm, setSearchTerm] = useState("");
   // Debounce the search term so filtering doesn't run on every keystroke.
@@ -188,6 +193,19 @@ export function JsonOutput({
                 <CheckCircle2 className="h-4 w-4 text-secondary" />
                 <span className="text-xs font-medium text-secondary">
                   Valid JSON
+                </span>
+              </motion.div>
+            ) : error ? (
+              <motion.div
+                key="invalid"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20"
+              >
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <span className="text-xs font-medium text-destructive">
+                  Invalid JSON
                 </span>
               </motion.div>
             ) : (
@@ -391,6 +409,43 @@ export function JsonOutput({
                   }}
                 />
               )}
+            </motion.div>
+          ) : error ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center h-full p-8 text-center"
+            >
+              <motion.div
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 0.5, repeat: 3 }}
+                className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10"
+              >
+                <AlertCircle className="h-7 w-7 text-destructive" />
+              </motion.div>
+              <p className="text-destructive font-semibold">
+                Couldn't parse this JSON
+              </p>
+              <p className="mt-1 max-w-md text-sm text-destructive/80 [overflow-wrap:anywhere]">
+                {error}
+              </p>
+              {onFix && (
+                <motion.button
+                  onClick={onFix}
+                  className="mt-5 flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-primary-foreground shadow-button focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  style={{ background: "var(--gradient-primary)" }}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Wrench className="h-5 w-5" />
+                  Try to fix
+                </motion.button>
+              )}
+              <p className="mt-3 text-xs text-muted-foreground/70">
+                Auto-fixes trailing commas, single quotes, unquoted keys & more
+              </p>
             </motion.div>
           ) : (
             <motion.div

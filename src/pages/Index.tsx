@@ -5,11 +5,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { JsonInput } from "@/components/JsonInput";
 import { JsonOutput } from "@/components/JsonOutput";
-import { ErrorAlert } from "@/components/ErrorAlert";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcutsHelp";
 import { useToast } from "@/hooks/use-toast";
 import { parseJsonWithError, formatParseError } from "@/lib/jsonError";
+import { tryRepairJson } from "@/lib/jsonRepair";
 
 const defaultSettings = {
   jsonInput: "",
@@ -153,7 +153,9 @@ const Index = () => {
       if (!result.ok) {
         setFormattedJson("");
         setParsedJson(null);
-        setError(null);
+        // Surface the error in the persistent banner so the "Try to fix" action
+        // is available; keep the toast for immediate feedback.
+        setError(formatParseError(result));
         toast({
           title: "Invalid JSON",
           description: formatParseError(result),
@@ -271,6 +273,39 @@ const Index = () => {
       return;
     }
     processJsonString(jsonInput);
+  }, [jsonInput, processJsonString, toast]);
+
+  // Best-effort repair of malformed JSON (only offered after Format fails).
+  const repairAndFormat = useCallback(() => {
+    if (jsonInput.trim() === "") {
+      toast({
+        title: "No JSON entered",
+        description: "Please enter some JSON to fix.",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+    const r = tryRepairJson(jsonInput);
+    if (!r.ok) {
+      toast({
+        title: "Couldn't auto-fix",
+        description: "The JSON is too malformed to repair automatically.",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+    // Show the corrected source in the input, then run it through the normal
+    // parse/format path (populates output + history, clears the error).
+    setJsonInput(r.repaired);
+    if (processJsonString(r.repaired)) {
+      toast({
+        title: "JSON repaired & formatted",
+        description: "Common mistakes were fixed automatically.",
+        duration: 3000,
+      });
+    }
   }, [jsonInput, processJsonString, toast]);
 
   const minifyJSON = useCallback(async () => {
@@ -512,18 +547,13 @@ const Index = () => {
             displayLayout={settings.displayLayout}
             isDark={isDark}
             isLoading={isFormatting}
+            error={error}
             onDownload={downloadJSON}
             onCopy={copyFormatted}
             onMinify={minifyJSON}
+            onFix={repairAndFormat}
           />
         </motion.div>
-
-        {/* Error Alert */}
-        <ErrorAlert
-          error={error}
-          parsedJson={parsedJson}
-          onDismiss={() => setError(null)}
-        />
 
         {/* Footer */}
         <motion.footer
