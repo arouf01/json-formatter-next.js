@@ -1,13 +1,21 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Palette, RotateCcw, Sparkles, X } from "lucide-react";
+import { Check, Moon, Palette, RotateCcw, Sparkles, Sun, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PALETTES } from "@/lib/theme";
 import { useThemeControl } from "@/components/ThemeProvider";
 
 export function ThemeColorPicker() {
-  const { primaryHex, colorAuto, modeAuto, mounted, setPrimary, reset } =
-    useThemeControl();
+  const {
+    mode,
+    primaryHex,
+    colorAuto,
+    modeAuto,
+    mounted,
+    setMode,
+    setPrimary,
+    reset,
+  } = useThemeControl();
   const [open, setOpen] = React.useState(false);
 
   if (!mounted) return null;
@@ -22,38 +30,90 @@ export function ThemeColorPicker() {
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
             transition={{ duration: 0.18 }}
             role="dialog"
-            aria-label="Theme color picker"
-            className="mb-3 w-72 rounded-2xl border border-border bg-popover p-4 shadow-2xl"
+            aria-label="Theme settings"
+            className="mb-3 w-[300px] rounded-2xl border border-border bg-popover p-4 shadow-2xl"
           >
+            {/* Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-bold">Theme color</h2>
+              <h2 className="text-base font-bold text-foreground">Theme</h2>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Close"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              {colorAuto ? (
-                <>
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  Color rotates hourly — pick one to lock it
-                </>
-              ) : (
-                "Custom color — saved on this device"
-              )}
-            </p>
-            <p className="mt-1 text-[11px] text-muted-foreground/80">
-              Mode: {modeAuto ? "auto (light by day / dark by night)" : "manual"}
-            </p>
+            {/* Mode */}
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Mode
+                </span>
+                {modeAuto ? (
+                  <span className="flex items-center gap-1 text-xs font-semibold text-primary">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    auto
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">manual</span>
+                )}
+              </div>
+              <div
+                role="group"
+                aria-label="Theme mode"
+                className="flex items-center gap-0.5 rounded-full border border-border bg-muted/60 p-0.5"
+              >
+                <button
+                  onClick={() => setMode("light")}
+                  aria-pressed={mode === "light"}
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                    mode === "light"
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Sun className="h-3.5 w-3.5" />
+                  Light
+                </button>
+                <button
+                  onClick={() => setMode("dark")}
+                  aria-pressed={mode === "dark"}
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                    mode === "dark"
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Moon className="h-3.5 w-3.5" />
+                  Dark
+                </button>
+              </div>
+            </div>
 
-            <div className="mt-4 grid grid-cols-7 gap-2">
+            {/* Color */}
+            <div className="mt-4 flex items-center gap-1.5">
+              <span className="text-sm font-medium text-muted-foreground">
+                Color
+              </span>
+              {colorAuto ? (
+                <span className="flex items-center gap-1 text-xs font-semibold text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  rotates hourly
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">custom</span>
+              )}
+            </div>
+
+            <div className="mt-3 grid grid-cols-7 gap-2">
               {PALETTES.map((p) => {
                 const active =
-                  !colorAuto && primaryHex.toLowerCase() === p.hex.toLowerCase();
+                  !colorAuto &&
+                  primaryHex.toLowerCase() === p.hex.toLowerCase();
                 return (
                   <button
                     key={p.hex}
@@ -63,20 +123,23 @@ export function ThemeColorPicker() {
                     title={p.name}
                     style={{ backgroundColor: p.hex }}
                     className={cn(
-                      "flex h-7 w-7 items-center justify-center rounded-full ring-offset-2 ring-offset-popover transition-transform hover:scale-110",
+                      "flex aspect-square w-full items-center justify-center rounded-full ring-offset-2 ring-offset-popover transition-transform hover:scale-110",
                       active && "ring-2 ring-foreground",
                     )}
                   >
-                    {active && <Check className="h-3.5 w-3.5 text-white" />}
+                    {active && <Check className="h-4 w-4 text-white" />}
                   </button>
                 );
               })}
             </div>
 
-            <label className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-2.5 text-sm">
+            {/* Custom */}
+            <label className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 p-3 text-sm">
               <span className="font-medium text-muted-foreground">Custom</span>
               <span className="flex items-center gap-2">
-                <span className="font-mono text-xs uppercase">{primaryHex}</span>
+                <span className="font-mono text-xs uppercase text-muted-foreground">
+                  {primaryHex}
+                </span>
                 <input
                   type="color"
                   value={primaryHex}
@@ -87,9 +150,10 @@ export function ThemeColorPicker() {
               </span>
             </label>
 
+            {/* Reset */}
             <button
               onClick={reset}
-              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
             >
               <RotateCcw className="h-4 w-4" />
               Reset to default
@@ -98,14 +162,15 @@ export function ThemeColorPicker() {
         )}
       </AnimatePresence>
 
+      {/* Floating trigger */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Customize theme color"
+        aria-label="Theme settings"
         aria-expanded={open}
         className="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/90 text-primary shadow-lg backdrop-blur transition-transform hover:scale-105"
       >
         <Palette className="h-5 w-5" />
-        {colorAuto && (
+        {(colorAuto || modeAuto) && (
           <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex h-3 w-3 rounded-full bg-primary ring-2 ring-background" />

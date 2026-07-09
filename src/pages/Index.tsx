@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { Braces, HelpCircle } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { JsonInput } from "@/components/JsonInput";
 import { JsonOutput } from "@/components/JsonOutput";
@@ -33,7 +32,7 @@ const HISTORY_KEY = "jsonFormatterHistory";
 const MAX_HISTORY = 10;
 
 const Index = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const { toast } = useToast();
 
   const [jsonInput, setJsonInput] = useState(defaultSettings.jsonInput);
@@ -472,7 +471,6 @@ const Index = () => {
             >
               <HelpCircle className="h-5 w-5" />
             </button>
-            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
             <SettingsPanel
               isOpen={displaySettings}
               onToggle={() => setDisplaySettings((prev) => !prev)}
