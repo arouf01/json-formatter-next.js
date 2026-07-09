@@ -447,7 +447,7 @@ const Index = () => {
           <div className="flex items-center gap-1 md:gap-3">
             <motion.div
               className="flex w-8 h-8 md:h-12 md:w-12 items-center justify-center rounded-sm md:rounded-xl bg-primary/10 shadow-glow"
-              whileHover={{ rotate: 10, scale: 1.05 }}
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               <Braces className="h-6 w-6 text-primary" />
