@@ -16,6 +16,10 @@
     --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 100%;
 
+    /* Interaction shades of the brand (follow the picker). */
+    --primary-hover: var(--primary-h) var(--primary-s) 53%;
+    --primary-active: var(--primary-h) var(--primary-s) 46%;
+
     /* Secondary / accent stay in the brand family (follow the picker). */
     --secondary: var(--primary-h) var(--primary-s) 46%;
     --secondary-foreground: 0 0% 100%;
@@ -29,6 +33,9 @@
     --background: 214 44% 98%;
     --foreground: 216 40% 14%;
 
+    /* Surface sits between background and card (panels, wells). */
+    --surface: 214 40% 99%;
+
     --card: 0 0% 100%;
     --card-foreground: 216 40% 14%;
 
@@ -38,15 +45,32 @@
     --muted: 214 32% 96%;
     --muted-foreground: 216 14% 44%;
 
+    /* Text roles. */
+    --heading: 216 44% 12%;
+    --body: 216 32% 22%;
+
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
+    /* Semantic status colors (independent of the brand hue). */
     --success: 152 62% 40%;
     --success-foreground: 0 0% 100%;
+    --warning: 38 92% 48%;
+    --warning-foreground: 0 0% 100%;
+    --error: 0 72% 51%;
+    --error-foreground: 0 0% 100%;
+    --info: 214 90% 54%;
+    --info-foreground: 0 0% 100%;
+
+    /* Links follow the brand. */
+    --link: var(--primary-h) var(--primary-s) 46%;
+    --link-hover: var(--primary-h) var(--primary-s) 36%;
 
     --border: 214 28% 90%;
+    --divider: 214 26% 88%;
     --input: 214 28% 90%;
     --ring: var(--primary);
+    --focus: var(--primary);
 
     --radius: 0.75rem;
 
@@ -84,6 +108,9 @@
   .dark {
     /* Dark mode — deep blue-black neutrals. Brand vars inherit from :root so
        the selected primary stays identical across light and dark. */
+    --primary-hover: var(--primary-h) var(--primary-s) 66%;
+    --primary-active: var(--primary-h) var(--primary-s) 72%;
+
     --secondary: var(--primary-h) 90% 62%;
     --secondary-foreground: 0 0% 100%;
 
@@ -92,6 +119,8 @@
 
     --background: 216 42% 7%;
     --foreground: 210 20% 98%;
+
+    --surface: 216 38% 13%;
 
     --card: 216 38% 11%;
     --card-foreground: 210 20% 98%;
@@ -102,15 +131,29 @@
     --muted: 216 30% 16%;
     --muted-foreground: 214 16% 66%;
 
+    --heading: 210 24% 98%;
+    --body: 214 18% 82%;
+
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 152 55% 48%;
     --success-foreground: 0 0% 100%;
+    --warning: 38 92% 56%;
+    --warning-foreground: 216 40% 14%;
+    --error: 0 72% 60%;
+    --error-foreground: 0 0% 100%;
+    --info: 214 90% 66%;
+    --info-foreground: 216 40% 14%;
+
+    --link: var(--primary-h) var(--primary-s) 74%;
+    --link-hover: var(--primary-h) var(--primary-s) 84%;
 
     --border: 216 26% 20%;
+    --divider: 216 24% 24%;
     --input: 216 26% 20%;
     --ring: var(--primary);
+    --focus: var(--primary);
 
     --gradient-surface: linear-gradient(
       135deg,
@@ -138,12 +181,12 @@
   .theme-transition *::before,
   .theme-transition *::after {
     transition:
-      background-color 0.35s ease,
-      border-color 0.35s ease,
-      color 0.35s ease,
-      fill 0.35s ease,
-      stroke 0.35s ease,
-      box-shadow 0.35s ease !important;
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      fill 0.25s ease,
+      stroke 0.25s ease,
+      box-shadow 0.25s ease !important;
   }
   @media (prefers-reduced-motion: reduce) {
     .theme-transition,
@@ -165,8 +208,31 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Text selection follows the brand color. */
   ::selection {
     @apply bg-primary/20;
+  }
+
+  /* Brand-tinted scrollbars (retint with the theme). */
+  * {
+    scrollbar-color: hsl(var(--primary) / 0.5) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.6);
+    background-clip: content-box;
   }
 }
 

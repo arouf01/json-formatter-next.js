@@ -78,11 +78,12 @@ export function CursorSpotlight() {
     >
       <div
         ref={ref}
-        className="absolute left-[-190px] top-[-190px] h-[380px] w-[380px] rounded-full opacity-0 transition-opacity duration-500 will-change-transform"
+        className="absolute left-[-150px] top-[-150px] h-[300px] w-[300px] rounded-full opacity-0 transition-opacity duration-500 will-change-transform"
         style={{
+          // ~300px soft brand glow, peak opacity ~12% (within the 8–15% band).
           background:
-            "radial-gradient(circle, hsl(var(--primary) / 0.16) 0%, hsl(var(--primary) / 0.06) 45%, transparent 72%)",
-          filter: "blur(22px)",
+            "radial-gradient(circle, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.05) 45%, transparent 72%)",
+          filter: "blur(20px)",
         }}
       />
     </div>

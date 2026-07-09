@@ -2,17 +2,22 @@ import * as React from "react";
 import {
   DEFAULT_HEX,
   KEYS,
-  autoState,
+  autoHex,
+  autoMode,
   hexToHsl,
   isLightColor,
   type Mode,
 } from "@/lib/theme";
+import { updateFavicon } from "@/lib/favicon";
 
 type ThemeControl = {
   mode: Mode;
   isDark: boolean;
   primaryHex: string;
-  isAuto: boolean;
+  /** True while the light/dark mode still follows the clock. */
+  modeAuto: boolean;
+  /** True while the brand color still rotates hourly. */
+  colorAuto: boolean;
   mounted: boolean;
   setMode: (m: Mode) => void;
   toggleTheme: () => void;
@@ -64,7 +69,7 @@ function apply(hex: string, mode: Mode, animate: boolean) {
     clearTimeout(transitionTimer);
     transitionTimer = setTimeout(
       () => el.classList.remove("theme-transition"),
-      360,
+      260,
     );
   }
   const [h, s, l] = hexToHsl(hex);
@@ -77,18 +82,31 @@ function apply(hex: string, mode: Mode, animate: boolean) {
   );
   el.classList.toggle("dark", mode === "dark");
   el.style.colorScheme = mode;
+  // Browser chrome / social preview color follows the active brand color.
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", hex);
+  // Tab favicon is redrawn in the active brand color.
+  updateFavicon(hex);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false);
   const [mode, setModeState] = React.useState<Mode>("dark");
   const [primaryHex, setPrimaryHex] = React.useState<string>(DEFAULT_HEX);
-  const [isAuto, setIsAuto] = React.useState(true);
+  const [modeAuto, setModeAuto] = React.useState(true);
+  const [colorAuto, setColorAuto] = React.useState(true);
   const timer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Advance the automatic theme exactly on each hour boundary, without a refresh.
+  // Latest values for the hourly timer closure (avoids stale reads).
+  const stateRef = React.useRef({ hex: primaryHex, mode, modeAuto, colorAuto });
+  stateRef.current = { hex: primaryHex, mode, modeAuto, colorAuto };
+
+  // Advance whichever aspect is still automatic, exactly on each hour boundary,
+  // without a page refresh.
   const scheduleAuto = React.useCallback(() => {
     clearTimeout(timer.current);
+    const st = stateRef.current;
+    if (!st.modeAuto && !st.colorAuto) return; // nothing automatic → no timer
     const now = new Date();
     const msToNextHour =
       (60 - now.getMinutes()) * 60000 -
@@ -96,38 +114,42 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       now.getMilliseconds() +
       50;
     timer.current = setTimeout(() => {
-      const { hex, mode: m } = autoState();
-      apply(hex, m, true);
-      setPrimaryHex(hex);
-      setModeState(m);
+      const s = stateRef.current;
+      const nextHex = s.colorAuto ? autoHex() : s.hex;
+      const nextMode = s.modeAuto ? autoMode() : s.mode;
+      apply(nextHex, nextMode, true);
+      setPrimaryHex(nextHex);
+      setModeState(nextMode);
       scheduleAuto();
     }, msToNextHour);
   }, []);
 
   // Initialize from storage on mount (FOUC script already painted the DOM).
   React.useEffect(() => {
-    const auto = read(KEYS.auto) !== "false";
-    if (auto) {
-      const { hex, mode: m } = autoState();
-      setPrimaryHex(hex);
-      setModeState(m);
-      setIsAuto(true);
-      scheduleAuto();
-    } else {
-      setPrimaryHex(read(KEYS.color) || DEFAULT_HEX);
-      setModeState((read(KEYS.mode) as Mode) || "dark");
-      setIsAuto(false);
-    }
+    const mAuto = read(KEYS.modeAuto) !== "false";
+    const cAuto = read(KEYS.colorAuto) !== "false";
+    const hex = cAuto ? autoHex() : read(KEYS.color) || DEFAULT_HEX;
+    const m: Mode = mAuto
+      ? autoMode()
+      : (read(KEYS.mode) as Mode) || "dark";
+
+    setPrimaryHex(hex);
+    setModeState(m);
+    setModeAuto(mAuto);
+    setColorAuto(cAuto);
     setMounted(true);
+    scheduleAuto();
 
     // Re-sync when returning to a backgrounded tab (may have crossed an hour).
     const onVisible = () => {
       if (document.visibilityState !== "visible") return;
-      if (read(KEYS.auto) === "false") return;
-      const { hex, mode: m } = autoState();
-      apply(hex, m, true);
-      setPrimaryHex(hex);
-      setModeState(m);
+      const s = stateRef.current;
+      if (!s.modeAuto && !s.colorAuto) return;
+      const nextHex = s.colorAuto ? autoHex() : s.hex;
+      const nextMode = s.modeAuto ? autoMode() : s.mode;
+      apply(nextHex, nextMode, true);
+      setPrimaryHex(nextHex);
+      setModeState(nextMode);
       scheduleAuto();
     };
     document.addEventListener("visibilitychange", onVisible);
@@ -137,40 +159,51 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [scheduleAuto]);
 
-  // Any manual change freezes BOTH aspects and disables automation.
-  const goManual = React.useCallback((hex: string, m: Mode) => {
-    clearTimeout(timer.current);
-    write(KEYS.auto, "false");
-    write(KEYS.color, hex);
-    write(KEYS.mode, m);
-    apply(hex, m, true);
-    setPrimaryHex(hex);
-    setModeState(m);
-    setIsAuto(false);
-  }, []);
-
-  const setPrimary = React.useCallback(
-    (hex: string) => goManual(hex, mode),
-    [goManual, mode],
-  );
+  // Fix the MODE only. Color automation is left untouched (Rule 2).
   const setMode = React.useCallback(
-    (m: Mode) => goManual(primaryHex, m),
-    [goManual, primaryHex],
+    (m: Mode) => {
+      write(KEYS.modeAuto, "false");
+      write(KEYS.mode, m);
+      setModeAuto(false);
+      setModeState(m);
+      apply(stateRef.current.hex, m, true);
+      scheduleAuto(); // reschedule (color may still be auto)
+    },
+    [scheduleAuto],
   );
+
   const toggleTheme = React.useCallback(
     () => setMode(mode === "dark" ? "light" : "dark"),
     [setMode, mode],
   );
 
+  // Fix the COLOR only. Mode automation is left untouched (Rule 3).
+  const setPrimary = React.useCallback(
+    (hex: string) => {
+      write(KEYS.colorAuto, "false");
+      write(KEYS.color, hex);
+      setColorAuto(false);
+      setPrimaryHex(hex);
+      apply(hex, stateRef.current.mode, true);
+      scheduleAuto(); // reschedule (mode may still be auto)
+    },
+    [scheduleAuto],
+  );
+
+  // Clear everything → both automations back on (Rule 5).
   const reset = React.useCallback(() => {
-    remove(KEYS.auto);
-    remove(KEYS.color);
+    remove(KEYS.modeAuto);
+    remove(KEYS.colorAuto);
     remove(KEYS.mode);
-    const { hex, mode: m } = autoState();
-    apply(hex, m, true);
+    remove(KEYS.color);
+    remove(KEYS.legacyAuto);
+    const hex = autoHex();
+    const m = autoMode();
+    setColorAuto(true);
+    setModeAuto(true);
     setPrimaryHex(hex);
     setModeState(m);
-    setIsAuto(true);
+    apply(hex, m, true);
     scheduleAuto();
   }, [scheduleAuto]);
 
@@ -178,7 +211,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     mode,
     isDark: mode === "dark",
     primaryHex,
-    isAuto,
+    modeAuto,
+    colorAuto,
     mounted,
     setMode,
     toggleTheme,

@@ -1,18 +1,27 @@
 /**
- * Smart theme system (ported from A1 Zoho Solutions).
+ * Smart theme & brand-color system.
  *
  * Everything visual is derived from three CSS variables (`--primary-h/s/l`)
- * plus the `dark` class, so a "palette" is simply a primary color and its
- * light/dark variant is the current mode. Two independent things are automated
- * when the visitor hasn't customized anything:
- *   - Mode: Light 06:00–17:59, Dark 18:00–05:59.
- *   - Palette: rotates every hour, `PALETTES[hour % PALETTES.length]`.
- * The moment the visitor changes color or mode, automation is disabled and
- * their choice is persisted until they Reset to Default.
+ * plus the `dark` class, so a "palette" is just a primary color, and the
+ * current mode selects its light/dark variant.
+ *
+ * Priority order (highest first):
+ *   1. User's saved theme color   → `brand-primary`   (color-auto off)
+ *   2. User's saved theme mode    → `theme-mode`      (mode-auto off)
+ *   3. Automatic system           → time-based mode + hourly color rotation
+ *
+ * Theme MODE and theme COLOR are automated INDEPENDENTLY, each with its own
+ * "auto" flag, so the four cases in the spec all hold:
+ *   - Neither customized → both automatic (first visit).
+ *   - Only mode changed  → mode fixed, color keeps rotating hourly.
+ *   - Only color changed → color fixed, mode keeps following the clock.
+ *   - Both changed        → both fixed; nothing changes until Reset.
+ * Reset clears all saved keys and re-enables both automations.
  */
 
 export type Palette = { name: string; hex: string };
 
+/** 7 brand colors. Rotation repeats every 7 hours (00:00 → index 0). */
 export const PALETTES: Palette[] = [
   { name: "Blue", hex: "#3386FE" },
   { name: "Indigo", hex: "#6366F1" },
@@ -26,9 +35,11 @@ export const PALETTES: Palette[] = [
 export const DEFAULT_HEX = "#3386FE";
 
 export const KEYS = {
-  auto: "theme-auto", // "false" once the visitor customizes anything
+  modeAuto: "theme-mode-auto", // "false" once the visitor fixes the mode
+  colorAuto: "theme-color-auto", // "false" once the visitor fixes the color
+  mode: "theme-mode", // saved "light" | "dark" (manual)
   color: "brand-primary", // saved primary hex (manual)
-  mode: "theme-mode", // "light" | "dark" (manual)
+  legacyAuto: "theme-auto", // removed on reset (older single-flag builds)
 } as const;
 
 export type Mode = "light" | "dark";
@@ -78,18 +89,21 @@ export function paletteIndexForHour(hour: number): number {
   return ((hour % PALETTES.length) + PALETTES.length) % PALETTES.length;
 }
 
-/** The automatic palette + mode for a given moment. */
-export function autoState(date = new Date()): { hex: string; mode: Mode } {
+/** Automatic brand color for a given moment (hourly rotation). */
+export function autoHex(date = new Date()): string {
+  return PALETTES[paletteIndexForHour(date.getHours())].hex;
+}
+
+/** Automatic light/dark mode for a given moment (day/night). */
+export function autoMode(date = new Date()): Mode {
   const hour = date.getHours();
-  const hex = PALETTES[paletteIndexForHour(hour)].hex;
-  const mode: Mode = hour >= 6 && hour < 18 ? "light" : "dark";
-  return { hex, mode };
+  return hour >= 6 && hour < 18 ? "light" : "dark";
 }
 
 /**
  * Inline, dependency-free script that applies the correct theme BEFORE first
- * paint (no flash). Kept in sync with the controller's `apply()`. Exported for
- * reference; the equivalent script also lives inline in index.html.
+ * paint (no flash of incorrect theme). Kept in sync with the controller's
+ * `apply()`. The equivalent script also lives inline in index.html.
  */
 export const THEME_FOUC_SCRIPT = `(function(){try{
 var K=${JSON.stringify(KEYS)},P=${JSON.stringify(PALETTES.map((p) => p.hex))},D=${JSON.stringify(DEFAULT_HEX)};
@@ -104,9 +118,10 @@ return[Math.round(hu*360),Math.round(sa*100),Math.round(li*100)];}
 function light(x){var h=x.replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c}).join('');
 var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
 return (r*299+g*587+b*114)/1000>150;}
-var auto=ls(K.auto)!=='false',hex,mode;
-if(auto){var hr=new Date().getHours();hex=P[((hr%P.length)+P.length)%P.length];mode=(hr>=6&&hr<18)?'light':'dark';}
-else{hex=ls(K.color)||D;mode=ls(K.mode)||'dark';}
+var hr=new Date().getHours();
+var colorAuto=ls(K.colorAuto)!=='false',modeAuto=ls(K.modeAuto)!=='false';
+var hex=colorAuto?P[((hr%P.length)+P.length)%P.length]:(ls(K.color)||D);
+var mode=modeAuto?((hr>=6&&hr<18)?'light':'dark'):(ls(K.mode)||'dark');
 var hsl=toHsl(hex),s=document.documentElement;
 s.style.setProperty('--primary-h',hsl[0]);
 s.style.setProperty('--primary-s',hsl[1]+'%');
@@ -114,4 +129,5 @@ s.style.setProperty('--primary-l',hsl[2]+'%');
 s.style.setProperty('--primary-foreground',light(hex)?'216 40% 14%':'0 0% 100%');
 if(mode==='dark')s.classList.add('dark');else s.classList.remove('dark');
 s.style.colorScheme=mode;
+var mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',hex);
 }catch(e){}})();`;

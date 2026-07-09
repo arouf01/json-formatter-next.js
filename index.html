@@ -67,17 +67,18 @@
     <meta name="theme-color" content="#3386FE" />
 
     <!-- Smart theme (A1 Zoho Solutions): applies the brand color + light/dark
-         mode BEFORE first paint so there's no flash. Auto = light by day /
-         dark by night, brand color rotates hourly, until the visitor picks a
-         color or mode (then their choice is persisted). Kept in sync with
-         src/lib/theme.ts (THEME_FOUC_SCRIPT). -->
+         mode BEFORE first paint so there's no flash of incorrect theme. Mode
+         and color are automated independently — mode = light by day / dark by
+         night, color = rotates hourly — each until the visitor fixes it (then
+         their choice is persisted). Kept in sync with src/lib/theme.ts. -->
     <script>
       (function () {
         try {
           var K = {
-            auto: "theme-auto",
-            color: "brand-primary",
+            modeAuto: "theme-mode-auto",
+            colorAuto: "theme-color-auto",
             mode: "theme-mode",
+            color: "brand-primary",
           };
           var P = [
             "#3386FE",
@@ -144,17 +145,17 @@
               b = parseInt(h.slice(4, 6), 16);
             return (r * 299 + g * 587 + b * 114) / 1000 > 150;
           }
-          var auto = ls(K.auto) !== "false",
-            hex,
-            mode;
-          if (auto) {
-            var hr = new Date().getHours();
-            hex = P[((hr % P.length) + P.length) % P.length];
-            mode = hr >= 6 && hr < 18 ? "light" : "dark";
-          } else {
-            hex = ls(K.color) || D;
-            mode = ls(K.mode) || "dark";
-          }
+          var hr = new Date().getHours();
+          var colorAuto = ls(K.colorAuto) !== "false";
+          var modeAuto = ls(K.modeAuto) !== "false";
+          var hex = colorAuto
+            ? P[((hr % P.length) + P.length) % P.length]
+            : ls(K.color) || D;
+          var mode = modeAuto
+            ? hr >= 6 && hr < 18
+              ? "light"
+              : "dark"
+            : ls(K.mode) || "dark";
           var hsl = toHsl(hex),
             s = document.documentElement;
           s.style.setProperty("--primary-h", hsl[0]);
@@ -167,6 +168,8 @@
           if (mode === "dark") s.classList.add("dark");
           else s.classList.remove("dark");
           s.style.colorScheme = mode;
+          var mt = document.querySelector('meta[name="theme-color"]');
+          if (mt) mt.setAttribute("content", hex);
         } catch (e) {}
       })();
     </script>

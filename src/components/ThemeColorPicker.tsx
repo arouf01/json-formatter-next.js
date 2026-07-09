@@ -6,7 +6,8 @@ import { PALETTES } from "@/lib/theme";
 import { useThemeControl } from "@/components/ThemeProvider";
 
 export function ThemeColorPicker() {
-  const { primaryHex, isAuto, mounted, setPrimary, reset } = useThemeControl();
+  const { primaryHex, colorAuto, modeAuto, mounted, setPrimary, reset } =
+    useThemeControl();
   const [open, setOpen] = React.useState(false);
 
   if (!mounted) return null;
@@ -36,20 +37,23 @@ export function ThemeColorPicker() {
             </div>
 
             <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              {isAuto ? (
+              {colorAuto ? (
                 <>
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  Auto — rotates hourly, light by day / dark by night
+                  Color rotates hourly — pick one to lock it
                 </>
               ) : (
-                "Custom — saved on this device"
+                "Custom color — saved on this device"
               )}
+            </p>
+            <p className="mt-1 text-[11px] text-muted-foreground/80">
+              Mode: {modeAuto ? "auto (light by day / dark by night)" : "manual"}
             </p>
 
             <div className="mt-4 grid grid-cols-7 gap-2">
               {PALETTES.map((p) => {
                 const active =
-                  !isAuto && primaryHex.toLowerCase() === p.hex.toLowerCase();
+                  !colorAuto && primaryHex.toLowerCase() === p.hex.toLowerCase();
                 return (
                   <button
                     key={p.hex}
@@ -101,7 +105,7 @@ export function ThemeColorPicker() {
         className="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-border bg-background/90 text-primary shadow-lg backdrop-blur transition-transform hover:scale-105"
       >
         <Palette className="h-5 w-5" />
-        {isAuto && (
+        {colorAuto && (
           <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex h-3 w-3 rounded-full bg-primary ring-2 ring-background" />
