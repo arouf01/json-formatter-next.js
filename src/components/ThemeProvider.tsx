@@ -8,7 +8,6 @@ import {
   isLightColor,
   type Mode,
 } from "@/lib/theme";
-import { updateFavicon } from "@/lib/favicon";
 
 type ThemeControl = {
   mode: Mode;
@@ -85,8 +84,7 @@ function apply(hex: string, mode: Mode, animate: boolean) {
   // Browser chrome / social preview color follows the active brand color.
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", hex);
-  // Tab favicon is redrawn in the active brand color.
-  updateFavicon(hex);
+  // The favicon retints via the <DynamicFavicon> component (reacts to primaryHex).
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

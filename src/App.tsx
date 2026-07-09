@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteBackground } from "@/components/SiteBackground";
 import { CursorSpotlight } from "@/components/CursorSpotlight";
 import { ThemeColorPicker } from "@/components/ThemeColorPicker";
+import DynamicFavicon from "@/components/DynamicFavicon";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -19,6 +20,8 @@ const App = () => (
     <MotionConfig reducedMotion="user">
       <ThemeProvider>
         <TooltipProvider>
+          {/* Favicon retints with the active brand color */}
+          <DynamicFavicon />
           {/* Brand-tinted decorative layers — follow the theme picker / rotation */}
           <SiteBackground />
           <CursorSpotlight />
