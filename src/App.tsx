@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteBackground } from "@/components/SiteBackground";
 import { CursorSpotlight } from "@/components/CursorSpotlight";
 import { ThemeColorPicker } from "@/components/ThemeColorPicker";
+import { BackToTop } from "@/components/BackToTop";
 import DynamicFavicon from "@/components/DynamicFavicon";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
           <ThemeColorPicker />
+          <BackToTop />
         </TooltipProvider>
       </ThemeProvider>
     </MotionConfig>

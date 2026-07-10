@@ -31,7 +31,7 @@ export function ThemeColorPicker() {
             transition={{ duration: 0.18 }}
             role="dialog"
             aria-label="Theme settings"
-            className="mb-3 w-[300px] rounded-2xl border border-border bg-popover p-4 shadow-2xl"
+            className="mb-3 w-[300px] max-w-[calc(100vw-2.5rem)] rounded-2xl border border-border bg-popover p-4 shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between">

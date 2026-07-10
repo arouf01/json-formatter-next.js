@@ -25,7 +25,9 @@ export function SettingsPanel({
         className="flex items-center gap-2 py-1.5 px-3 md:px-5 md:py-2.5 rounded-sm md:rounded-xl border border-border bg-card text-primary font-medium shadow-card hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       >
         <Settings2 className="h-5 w-5" />
-        <span className="text-xs md:text-lg">Display Settings</span>
+        <span className="hidden xs:inline text-xs md:text-lg">
+          Display Settings
+        </span>
       </motion.button>
 
       {/* Backdrop + Sidebar */}

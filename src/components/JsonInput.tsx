@@ -144,7 +144,7 @@ export function JsonInput({
 
       {/* Action Buttons */}
       <motion.div
-        className="flex flex-wrap justify-center gap-3 mt-5"
+        className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-3 mt-5"
         initial="hidden"
         animate="visible"
         variants={{
@@ -159,7 +159,7 @@ export function JsonInput({
       >
         <motion.button
           onClick={onFormat}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-primary-foreground shadow-button transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl font-semibold text-primary-foreground shadow-button transition-all duration-300 w-full sm:w-[150px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-primary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },
@@ -174,7 +174,7 @@ export function JsonInput({
 
         <motion.button
           onClick={onClear}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-muted text-muted-foreground hover:bg-muted/80 shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-muted text-muted-foreground hover:bg-muted/80 shadow-lg transition-all duration-300 justify-center w-full sm:w-[150px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           variants={{
             hidden: { opacity: 0, y: 20 },
             visible: { opacity: 1, y: 0 },
@@ -188,7 +188,7 @@ export function JsonInput({
 
         <motion.button
           onClick={triggerUpload}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 justify-center w-full sm:w-[150px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-secondary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },
@@ -203,7 +203,7 @@ export function JsonInput({
 
         <motion.button
           onClick={onPaste}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 min-w-[140px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-secondary-foreground shadow-lg transition-all duration-300 justify-center w-full sm:w-[150px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{ background: "var(--gradient-secondary)" }}
           variants={{
             hidden: { opacity: 0, y: 20 },

@@ -166,7 +166,7 @@ export function JsonOutput({
       transition={{ duration: 0.5, delay: 0.2 }}
       className="flex flex-col h-full p-5 rounded-2xl border border-secondary/20 bg-gradient-to-br from-secondary/5 to-secondary/10 shadow-card"
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <motion.div
             className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/10"
@@ -252,7 +252,7 @@ export function JsonOutput({
                 whileTap={{ scale: 0.95 }}
               >
                 <Download className="h-4 w-4 text-secondary" />
-                <span className="text-xs font-medium text-secondary">
+                <span className="hidden xs:inline text-xs font-medium text-secondary">
                   Download
                 </span>
               </motion.button>

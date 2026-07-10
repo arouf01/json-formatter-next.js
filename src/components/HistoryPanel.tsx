@@ -44,12 +44,12 @@ export function HistoryPanel({
         <summary className="flex items-center gap-2 py-1.5 px-3 md:px-5 md:py-2.5 rounded-sm md:rounded-xl border border-border bg-card text-muted-foreground font-medium shadow-card hover:bg-accent cursor-pointer list-none marker:hidden">
           <History className="h-5 w-5" />
           <span className="text-xs md:text-lg">
-            History ({history.length})
+            <span className="hidden xs:inline">History </span>({history.length})
           </span>
         </summary>
 
         <motion.div
-          className="absolute left-0 top-full mt-2 z-40 w-64 max-h-72 bg-card border border-border rounded-xl shadow-xl p-4 overflow-y-auto"
+          className="absolute left-0 top-full mt-2 z-40 w-64 max-w-[calc(100vw-2rem)] max-h-72 bg-card border border-border rounded-xl shadow-xl p-4 overflow-y-auto"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
