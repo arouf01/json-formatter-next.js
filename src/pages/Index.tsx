@@ -584,6 +584,10 @@ const Index = () => {
                 Abdur Rouf
               </a>
             </p>
+            <p className="mt-2">
+              © {new Date().getFullYear()} A1 Zoho Solutions. All rights
+              reserved.
+            </p>
           </div>
         </motion.footer>
       </div>
