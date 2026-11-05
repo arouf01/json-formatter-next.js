@@ -1,0 +1,10 @@
+# ---------------------------------------------------------------------------
+# OLD HOSTING redirect for  json.a1zohosolutions.com
+# Upload the CONTENTS of this folder into the old subdomain's document root
+# (replacing the old app). Every request 301-redirects to the new subdomain,
+# keeping the full path and query string so old links and SEO carry over.
+# ---------------------------------------------------------------------------
+RewriteEngine On
+
+# Send everything to the new home (path + query string preserved).
+RewriteRule ^(.*)$ https://json.a1flows.com/$1 [R=301,L]

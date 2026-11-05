@@ -1,0 +1,78 @@
+name: Build & Deploy
+
+# Builds the Vite site and uploads dist/ to the cPanel subdomain over FTPS.
+# Set the FTP_SERVER / FTP_USERNAME / FTP_PASSWORD secrets (Settings -> Secrets
+# and variables -> Actions) to enable the upload; until they exist the workflow
+# still builds and verifies, but skips the upload instead of failing.
+#   FTP_SERVER   = delta.hostseba.com      (NOT ftp.a1flows.com - FTPS cert is for delta)
+#   FTP_USERNAME = deploy-json@a1flows.com
+#   FTP_PASSWORD = <the FTP account password>
+# The FTP account must be rooted at json.a1flows.com's document root.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run - log what WOULD be uploaded, change nothing on the server"
+        type: boolean
+        default: false
+
+# Never run two uploads at once; queue instead of cancelling mid-upload.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -f dist/index.html || { echo "::error::dist/index.html missing"; exit 1; }
+          test -f dist/.htaccess || echo "::warning::dist/.htaccess missing - SPA deep links may 404 on refresh"
+
+      # Until the FTP secrets are added, build + verify still run but the upload
+      # is skipped instead of failing the whole workflow.
+      - name: Check deploy secrets
+        id: secrets
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        run: |
+          if [ -n "$FTP_SERVER" ]; then echo "ready=true" >> "$GITHUB_OUTPUT";
+          else echo "ready=false" >> "$GITHUB_OUTPUT"; echo "::warning::FTP_SERVER / FTP_USERNAME / FTP_PASSWORD not set - skipping upload."; fi
+
+      - name: Deploy dist/ to cPanel
+        if: steps.secrets.outputs.ready == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # Explicit FTPS (AUTH TLS) on the standard control port.
+          protocol: ftps
+          port: 21
+          local-dir: ./dist/
+          # Relative to the FTP account's login folder - the account must be
+          # rooted at this subdomain's document root (target "./").
+          server-dir: ${{ vars.FTP_REMOTE_DIR || './' }}
+          dry-run: ${{ inputs.dry_run || false }}
+          # Do NOT enable: it would wipe the whole folder first (incl. .well-known
+          # used for SSL renewal). Incremental sync only touches its own files.
+          dangerous-clean-slate: false

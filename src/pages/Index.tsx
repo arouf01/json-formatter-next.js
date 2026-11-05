@@ -358,7 +358,7 @@ const Index = () => {
       const dataStr = JSON.stringify(dataToDownload, null, 2);
       const dataUri =
         "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-      const exportFileDefaultName = `${jsonTitle || "response"} - by json.a1zohosolutions.com.json`;
+      const exportFileDefaultName = `${jsonTitle || "response"} - by json.a1flows.com.json`;
       const linkElement = document.createElement("a");
       linkElement.setAttribute("href", dataUri);
       linkElement.setAttribute("download", exportFileDefaultName);
@@ -569,7 +569,7 @@ const Index = () => {
             <p>
               Powered by{" "}
               <a
-                href="https://a1zohosolutions.com/"
+                href="https://a1flows.com/"
                 target="_blank"
                 className="text-primary hover:underline"
               >
@@ -577,7 +577,7 @@ const Index = () => {
               </a>{" "}
               | Developed by{" "}
               <a
-                href="https://arouf.a1zohosolutions.com/"
+                href="https://abdur-rouf.a1flows.com/"
                 target="_blank"
                 className="text-primary hover:underline"
               >
