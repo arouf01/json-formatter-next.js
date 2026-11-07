@@ -100,10 +100,7 @@ export function ThemeColorPicker() {
                 Color
               </span>
               {colorAuto ? (
-                <span className="flex items-center gap-1 text-xs font-semibold text-primary">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  rotates hourly
-                </span>
+                <span className="text-xs text-muted-foreground">default</span>
               ) : (
                 <span className="text-xs text-muted-foreground">custom</span>
               )}

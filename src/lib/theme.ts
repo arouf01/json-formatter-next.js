@@ -8,7 +8,8 @@
  * Priority order (highest first):
  *   1. User's saved theme color   → `brand-primary`   (color-auto off)
  *   2. User's saved theme mode    → `theme-mode`      (mode-auto off)
- *   3. Automatic system           → time-based mode + hourly color rotation
+ *   3. Automatic system           → time-based day/night mode (the color is the
+ *                                   fixed A1 Flows brand violet — no rotation)
  *
  * Theme MODE and theme COLOR are automated INDEPENDENTLY, each with its own
  * "auto" flag, so the four cases in the spec all hold:
@@ -21,18 +22,18 @@
 
 export type Palette = { name: string; hex: string };
 
-/** 7 brand colors. Rotation repeats every 7 hours (00:00 → index 0). */
+/** Swatch row shown in the theme picker. The brand default is Violet (DEFAULT_HEX). */
 export const PALETTES: Palette[] = [
   { name: "Blue", hex: "#3386FE" },
   { name: "Indigo", hex: "#6366F1" },
-  { name: "Violet", hex: "#8B5CF6" },
+  { name: "Violet", hex: "#7C3AED" },
   { name: "Cyan", hex: "#06B6D4" },
   { name: "Emerald", hex: "#10B981" },
   { name: "Rose", hex: "#F43F5E" },
   { name: "Amber", hex: "#F59E0B" },
 ];
 
-export const DEFAULT_HEX = "#3386FE";
+export const DEFAULT_HEX = "#7C3AED";
 
 export const KEYS = {
   modeAuto: "theme-mode-auto", // "false" once the visitor fixes the mode
@@ -89,9 +90,12 @@ export function paletteIndexForHour(hour: number): number {
   return ((hour % PALETTES.length) + PALETTES.length) % PALETTES.length;
 }
 
-/** Automatic brand color for a given moment (hourly rotation). */
-export function autoHex(date = new Date()): string {
-  return PALETTES[paletteIndexForHour(date.getHours())].hex;
+/**
+ * Brand color. Fixed to the A1 Flows brand (DEFAULT_HEX); it no longer rotates
+ * hourly. Kept as a function so existing callers stay source-compatible.
+ */
+export function autoHex(): string {
+  return DEFAULT_HEX;
 }
 
 /** Automatic light/dark mode for a given moment (day/night). */
@@ -106,7 +110,7 @@ export function autoMode(date = new Date()): Mode {
  * `apply()`. The equivalent script also lives inline in index.html.
  */
 export const THEME_FOUC_SCRIPT = `(function(){try{
-var K=${JSON.stringify(KEYS)},P=${JSON.stringify(PALETTES.map((p) => p.hex))},D=${JSON.stringify(DEFAULT_HEX)};
+var K=${JSON.stringify(KEYS)},D=${JSON.stringify(DEFAULT_HEX)};
 function ls(k){try{var v=localStorage.getItem(k);if(v!=null)return v;}catch(e){}
 var m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]+)'));return m?decodeURIComponent(m[1]):null;}
 function toHsl(x){var h=x.replace('#','');if(h.length===3)h=h.split('').map(function(c){return c+c}).join('');
@@ -120,7 +124,7 @@ var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4
 return (r*299+g*587+b*114)/1000>150;}
 var hr=new Date().getHours();
 var colorAuto=ls(K.colorAuto)!=='false',modeAuto=ls(K.modeAuto)!=='false';
-var hex=colorAuto?P[((hr%P.length)+P.length)%P.length]:(ls(K.color)||D);
+var hex=colorAuto?D:(ls(K.color)||D);
 var mode=modeAuto?((hr>=6&&hr<18)?'light':'dark'):(ls(K.mode)||'dark');
 var hsl=toHsl(hex),s=document.documentElement;
 s.style.setProperty('--primary-h',hsl[0]);

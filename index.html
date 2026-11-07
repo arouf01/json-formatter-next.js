@@ -64,13 +64,13 @@
     />
 
     <!-- Theme Color -->
-    <meta name="theme-color" content="#3386FE" />
+    <meta name="theme-color" content="#7C3AED" />
 
     <!-- Smart theme (A1 Flows): applies the brand color + light/dark
          mode BEFORE first paint so there's no flash of incorrect theme. Mode
-         and color are automated independently — mode = light by day / dark by
-         night, color = rotates hourly — each until the visitor fixes it (then
-         their choice is persisted). Kept in sync with src/lib/theme.ts. -->
+         is automatic — light by day / dark by night — until the visitor fixes
+         it; the color is the fixed A1 Flows brand violet unless they pick one.
+         Kept in sync with src/lib/theme.ts. -->
     <script>
       (function () {
         try {
@@ -80,16 +80,7 @@
             mode: "theme-mode",
             color: "brand-primary",
           };
-          var P = [
-            "#3386FE",
-            "#6366F1",
-            "#8B5CF6",
-            "#06B6D4",
-            "#10B981",
-            "#F43F5E",
-            "#F59E0B",
-          ];
-          var D = "#3386FE";
+          var D = "#7C3AED";
           function ls(k) {
             try {
               var v = localStorage.getItem(k);
@@ -148,9 +139,7 @@
           var hr = new Date().getHours();
           var colorAuto = ls(K.colorAuto) !== "false";
           var modeAuto = ls(K.modeAuto) !== "false";
-          var hex = colorAuto
-            ? P[((hr % P.length) + P.length) % P.length]
-            : ls(K.color) || D;
+          var hex = colorAuto ? D : ls(K.color) || D;
           var mode = modeAuto
             ? hr >= 6 && hr < 18
               ? "light"

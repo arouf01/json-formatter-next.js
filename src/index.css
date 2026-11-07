@@ -5,13 +5,13 @@
 @layer base {
   :root {
     /* ── Brand color ──────────────────────────────────────────────────────
-       Single source of truth (A1 Flows). Default #3386FE ≈
-       hsl(214 99% 60%). The Theme Color Picker / hourly rotation override only
-       these three; every brand color, gradient, ring, and accent below is
-       derived from them, so the whole app retints from one place. */
-    --primary-h: 214;
-    --primary-s: 99%;
-    --primary-l: 60%;
+       Single source of truth (A1 Flows). Default #7C3AED ≈
+       hsl(262 83% 58%). The Theme Color Picker overrides only these three;
+       every brand color, gradient, ring, and accent below is derived from
+       them, so the whole app retints from one place. */
+    --primary-h: 262;
+    --primary-s: 83%;
+    --primary-l: 58%;
 
     --primary: var(--primary-h) var(--primary-s) var(--primary-l);
     --primary-foreground: 0 0% 100%;
