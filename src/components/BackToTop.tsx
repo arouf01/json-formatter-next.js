@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
 /**
- * Brand-colored "back to top" button (ported from the A1 Zoho Solutions site).
+ * Brand-colored "back to top" button (ported from the A1 Flows site).
  * Appears once the page is scrolled past 600px and smooth-scrolls to the top.
  * Fixed bottom-right so it never collides with the theme picker (bottom-left).
  */

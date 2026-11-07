@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* ── Brand color ──────────────────────────────────────────────────────
-       Single source of truth (A1 Zoho Solutions). Default #3386FE ≈
+       Single source of truth (A1 Flows). Default #3386FE ≈
        hsl(214 99% 60%). The Theme Color Picker / hourly rotation override only
        these three; every brand color, gradient, ring, and accent below is
        derived from them, so the whole app retints from one place. */

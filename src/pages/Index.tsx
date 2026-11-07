@@ -573,7 +573,7 @@ const Index = () => {
                 target="_blank"
                 className="text-primary hover:underline"
               >
-                A1 Zoho Solutions
+                A1 Flows
               </a>{" "}
               | Developed by{" "}
               <a
@@ -585,7 +585,7 @@ const Index = () => {
               </a>
             </p>
             <p className="mt-2">
-              © {new Date().getFullYear()} A1 Zoho Solutions. All rights
+              © {new Date().getFullYear()} A1 Flows. All rights
               reserved.
             </p>
           </div>
